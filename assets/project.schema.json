@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Empirical Significance Adjustment Project",
+  "type": "object",
+  "required": [
+    "project_id",
+    "research_question",
+    "unit_of_observation",
+    "sample_period",
+    "outcome",
+    "core_exposure",
+    "baseline_specification",
+    "software"
+  ],
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "research_question": {
+      "type": "string"
+    },
+    "theory_direction": {
+      "enum": [
+        "positive",
+        "negative",
+        "nonlinear",
+        "unknown"
+      ]
+    },
+    "unit_of_observation": {
+      "type": "string"
+    },
+    "panel_id": {
+      "type": "string"
+    },
+    "time_variable": {
+      "type": "string"
+    },
+    "sample_period": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "integer"
+        },
+        "end": {
+          "type": "integer"
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "continuous",
+            "count",
+            "proportion",
+            "binary",
+            "mixed"
+          ]
+        },
+        "has_zeros": {
+          "type": "boolean"
+        },
+        "has_negatives": {
+          "type": "boolean"
+        },
+        "skewed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "core_exposure": {
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "continuous",
+            "binary",
+            "did",
+            "instrumented",
+            "threshold"
+          ]
+        },
+        "assignment_level": {
+          "type": "string"
+        },
+        "construction": {
+          "type": "string"
+        }
+      }
+    },
+    "baseline_specification": {
+      "type": "object",
+      "required": [
+        "controls",
+        "fixed_effects",
+        "cluster"
+      ],
+      "properties": {
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fixed_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cluster": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stata_code": {
+          "type": "string"
+        }
+      }
+    },
+    "diagnostic_flags": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "allowed_adjustment_levels": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ]
+      }
+    },
+    "software": {
+      "enum": [
+        "stata",
+        "r",
+        "python",
+        "mixed"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

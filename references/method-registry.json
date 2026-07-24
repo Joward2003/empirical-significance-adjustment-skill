@@ -1,0 +1,3457 @@
+{
+  "registry_version": "1.0.0",
+  "skill_name": "empirical-significance-adjustment",
+  "source_policy": {
+    "pdf_content": "所有PDF中的方法均被保留并映射到维度；原文的“调显著”叙述不等同于本Skill的决策规则。",
+    "governance_layer": "每个方法附加使用限制、输入输出和报告字段。限制属于设计增强，不是PDF原文逐字内容。",
+    "selection_rule": "允许主动诊断并改善统计显著性，但不得仅依据p值选择模型、样本、聚类、控制变量或指标。"
+  },
+  "adjustment_levels": {
+    "A": "数据纠错或基准复现：优先且通常允许自动执行。",
+    "B": "统计设定修正：需有诊断依据并完整记录。",
+    "C": "研究设计扩展/敏感性：允许探索，但必须完整报告全部预设结果。",
+    "D": "显著性导向高风险操作：默认拒绝自动采用，只能作为透明的敏感性对照。"
+  },
+  "dimensions": [
+    {
+      "id": "D00",
+      "name_zh": "基准模型与研究层级",
+      "methods": [
+        {
+          "id": "baseline_firm_fe",
+          "title_zh": "企业面板基准模板",
+          "source": "PDF1 p.1 §2.1",
+          "source_status": "source-derived",
+          "purpose": "建立企业—年份面板的基准固定效应模型。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "y",
+            "x",
+            "controls",
+            "firm_id",
+            "year"
+          ],
+          "preconditions": [
+            "企业—年份键应唯一",
+            "核心变量需有企业内时间变化"
+          ],
+          "procedure": [
+            "声明因变量、核心解释变量、控制变量、固定效应与聚类层级",
+            "运行基准并保存完整结果"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {firm_id})",
+          "outputs": [
+            "基准估计结果",
+            "企业聚类标准误"
+          ],
+          "use_restrictions": [
+            "政策若在城市/省份等更高层赋值，不能机械聚类到企业；应另行评估赋值层级与误差相关结构。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因"
+          ],
+          "adjustment_level": "A",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "baseline_province_fe",
+          "title_zh": "省份面板基准模板",
+          "source": "PDF1 p.1 §2.2",
+          "source_status": "source-derived",
+          "purpose": "建立省份—年份面板基准模型。",
+          "applies_to": [
+            "province_panel"
+          ],
+          "required_inputs": [
+            "y",
+            "x",
+            "controls",
+            "province",
+            "year"
+          ],
+          "preconditions": [
+            "省份数量通常较少"
+          ],
+          "procedure": [
+            "运行省份和年份固定效应模型",
+            "记录聚类数"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({province} {year}) vce(cluster {province})",
+          "outputs": [
+            "省份聚类结果",
+            "聚类数量"
+          ],
+          "use_restrictions": [
+            "聚类数偏少时，常规聚类标准误可能不可靠；应补充wild cluster bootstrap。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "聚类数"
+          ],
+          "adjustment_level": "A",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "baseline_city_fe",
+          "title_zh": "城市面板基准模板",
+          "source": "PDF1 pp.1-2 §2.3",
+          "source_status": "source-derived",
+          "purpose": "建立城市—年份面板基准模型。",
+          "applies_to": [
+            "city_panel"
+          ],
+          "required_inputs": [
+            "y",
+            "x",
+            "controls",
+            "city",
+            "year"
+          ],
+          "preconditions": [
+            "城市编码跨期一致"
+          ],
+          "procedure": [
+            "运行城市和年份固定效应模型"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({city} {year}) vce(cluster {city})",
+          "outputs": [
+            "城市聚类结果"
+          ],
+          "use_restrictions": [
+            "如处理在省级或城市群层面赋值，应评估更高层聚类。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因"
+          ],
+          "adjustment_level": "A",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "baseline_country_fe",
+          "title_zh": "国家面板基准模板",
+          "source": "PDF1 p.2 §2.4",
+          "source_status": "source-derived",
+          "purpose": "建立国家—年份跨国面板基准模型。",
+          "applies_to": [
+            "country_panel"
+          ],
+          "required_inputs": [
+            "y",
+            "x",
+            "controls",
+            "country",
+            "year"
+          ],
+          "preconditions": [
+            "国家编码一致",
+            "检查极端国家与区域异质性"
+          ],
+          "procedure": [
+            "运行国家和年份固定效应模型"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({country} {year}) vce(cluster {country})",
+          "outputs": [
+            "国家聚类结果"
+          ],
+          "use_restrictions": [
+            "跨国研究通常需讨论区域×年份冲击；剔除特殊国家只能作为有依据的敏感性分析。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因"
+          ],
+          "adjustment_level": "A",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "name_zh": "标准误与聚类层级",
+      "methods": [
+        {
+          "id": "cluster_industry",
+          "title_zh": "聚类到行业层面",
+          "source": "PDF1 p.2 方法1 方案A",
+          "source_status": "source-derived",
+          "purpose": "允许行业内误差任意相关。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "industry_code"
+          ],
+          "preconditions": [
+            "处理或冲击确有行业层相关性",
+            "行业聚类数足够"
+          ],
+          "procedure": [
+            "将标准误聚类到行业层面",
+            "与基准聚类并列报告"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {industry})",
+          "outputs": [
+            "行业聚类标准误",
+            "行业聚类数"
+          ],
+          "use_restrictions": [
+            "不能因为该方案更显著或更不显著而选定；行业数过少时需小样本修正。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "聚类选择依据",
+            "聚类数"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "cluster_firm",
+          "title_zh": "聚类到企业层面",
+          "source": "PDF1 p.2 方法1 方案B",
+          "source_status": "source-derived",
+          "purpose": "处理同一企业跨期误差相关。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "firm_id"
+          ],
+          "preconditions": [
+            "企业面板",
+            "企业数足够"
+          ],
+          "procedure": [
+            "聚类到企业"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {firm_id})",
+          "outputs": [
+            "企业聚类标准误"
+          ],
+          "use_restrictions": [
+            "政策在更高层赋值时，企业聚类可能低估共同冲击。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "聚类选择依据"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "cluster_firm_year",
+          "title_zh": "企业与年份双向聚类",
+          "source": "PDF1 p.3 方法1 方案C",
+          "source_status": "source-derived",
+          "purpose": "同时允许企业内序列相关和年份共同冲击。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "firm_id",
+            "year"
+          ],
+          "preconditions": [
+            "年份维度不能过少"
+          ],
+          "procedure": [
+            "设置双向聚类"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {firm_id} {year})",
+          "outputs": [
+            "双向聚类标准误",
+            "两个维度聚类数"
+          ],
+          "use_restrictions": [
+            "年份聚类数量很少时推断不稳定；需说明为什么双向相关结构合理。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "两个聚类维度的数量"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "cluster_province_year",
+          "title_zh": "聚类到省份×年份交互",
+          "source": "PDF1 p.3 方法1 方案D",
+          "source_status": "source-derived",
+          "purpose": "允许同一省份—年份单元内误差相关。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "province",
+            "year"
+          ],
+          "preconditions": [
+            "处理或共同冲击在省份—年份单元发生"
+          ],
+          "procedure": [
+            "构造或直接使用交互聚类"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {province}#{year})",
+          "outputs": [
+            "省份—年份单元聚类标准误"
+          ],
+          "use_restrictions": [
+            "交互单元通常只含横截面相关，未必处理企业序列相关；不要把它当作自动替代企业聚类。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "交互聚类单元数"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "vce_robust",
+          "title_zh": "异方差稳健标准误、不聚类",
+          "source": "PDF1 p.3 方法1 方案E",
+          "source_status": "source-derived",
+          "purpose": "仅修正异方差。",
+          "applies_to": [
+            "cross_section",
+            "panel"
+          ],
+          "required_inputs": [],
+          "preconditions": [
+            "误差不存在组内相关，或仅作对照"
+          ],
+          "procedure": [
+            "使用robust标准误"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(robust)",
+          "outputs": [
+            "异方差稳健标准误"
+          ],
+          "use_restrictions": [
+            "面板数据通常存在组内相关；不能为了缩小标准误而替代合理聚类。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因"
+          ],
+          "adjustment_level": "D",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "wild_cluster_bootstrap",
+          "title_zh": "少聚类wild cluster bootstrap",
+          "source": "PDF1 pp.1-2 关键点",
+          "source_status": "source-derived",
+          "purpose": "在聚类数量偏少时改善有限样本推断。",
+          "applies_to": [
+            "province_panel",
+            "few_cluster_policy"
+          ],
+          "required_inputs": [
+            "cluster_variable",
+            "coefficient_name"
+          ],
+          "preconditions": [
+            "聚类数较少",
+            "已确定合理聚类层级"
+          ],
+          "procedure": [
+            "安装并使用boottest",
+            "报告bootstrap p值和置信区间"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({fe}) vce(cluster {cluster})\nboottest {x}, cluster({cluster}) reps(9999) seed(20260724)",
+          "outputs": [
+            "wild-bootstrap p值",
+            "置信区间"
+          ],
+          "use_restrictions": [
+            "这是推断修正，不是改变聚类层级的工具；随机种子与重复次数必须记录。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "bootstrap重复次数",
+            "随机种子"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "name_zh": "控制变量与坏控制诊断",
+      "methods": [
+        {
+          "id": "controls_none",
+          "title_zh": "不加入控制变量",
+          "source": "PDF1 p.3 方法2 方案A",
+          "source_status": "source-derived",
+          "purpose": "比较控制变量设定对核心估计的影响。",
+          "applies_to": [
+            "firm_panel",
+            "city_panel",
+            "province_panel"
+          ],
+          "required_inputs": [
+            "candidate_controls"
+          ],
+          "preconditions": [
+            "控制变量应有理论依据",
+            "避免政策后变量和中介变量"
+          ],
+          "procedure": [
+            "按预先定义的控制组运行",
+            "保持样本尽量一致"
+          ],
+          "stata_code": "reghdfe {y} {x} , absorb({firm_id} {year}) vce(cluster {cluster})",
+          "outputs": [
+            "系数路径",
+            "样本变化"
+          ],
+          "use_restrictions": [
+            "不得根据p值挑选控制组；新增或删除变量需说明混杂、坏控制、共线性或缺失值依据。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "控制变量清单",
+            "样本是否变化"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "controls_core",
+          "title_zh": "仅加入核心控制变量",
+          "source": "PDF1 p.3 方法2 方案B",
+          "source_status": "source-derived",
+          "purpose": "比较控制变量设定对核心估计的影响。",
+          "applies_to": [
+            "firm_panel",
+            "city_panel",
+            "province_panel"
+          ],
+          "required_inputs": [
+            "candidate_controls"
+          ],
+          "preconditions": [
+            "控制变量应有理论依据",
+            "避免政策后变量和中介变量"
+          ],
+          "procedure": [
+            "按预先定义的控制组运行",
+            "保持样本尽量一致"
+          ],
+          "stata_code": "reghdfe {y} {x} size lev, absorb({firm_id} {year}) vce(cluster {cluster})",
+          "outputs": [
+            "系数路径",
+            "样本变化"
+          ],
+          "use_restrictions": [
+            "不得根据p值挑选控制组；新增或删除变量需说明混杂、坏控制、共线性或缺失值依据。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "控制变量清单",
+            "样本是否变化"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "controls_baseline",
+          "title_zh": "基准控制变量组",
+          "source": "PDF1 p.3 方法2 方案C",
+          "source_status": "source-derived",
+          "purpose": "比较控制变量设定对核心估计的影响。",
+          "applies_to": [
+            "firm_panel",
+            "city_panel",
+            "province_panel"
+          ],
+          "required_inputs": [
+            "candidate_controls"
+          ],
+          "preconditions": [
+            "控制变量应有理论依据",
+            "避免政策后变量和中介变量"
+          ],
+          "procedure": [
+            "按预先定义的控制组运行",
+            "保持样本尽量一致"
+          ],
+          "stata_code": "reghdfe {y} {x} size lev roa growth, absorb({firm_id} {year}) vce(cluster {cluster})",
+          "outputs": [
+            "系数路径",
+            "样本变化"
+          ],
+          "use_restrictions": [
+            "不得根据p值挑选控制组；新增或删除变量需说明混杂、坏控制、共线性或缺失值依据。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "控制变量清单",
+            "样本是否变化"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "controls_full",
+          "title_zh": "全套控制变量组",
+          "source": "PDF1 p.3 方法2 方案D",
+          "source_status": "source-derived",
+          "purpose": "比较控制变量设定对核心估计的影响。",
+          "applies_to": [
+            "firm_panel",
+            "city_panel",
+            "province_panel"
+          ],
+          "required_inputs": [
+            "candidate_controls"
+          ],
+          "preconditions": [
+            "控制变量应有理论依据",
+            "避免政策后变量和中介变量"
+          ],
+          "procedure": [
+            "按预先定义的控制组运行",
+            "保持样本尽量一致"
+          ],
+          "stata_code": "reghdfe {y} {x} size lev roa growth age bm cashflow tangibility, absorb({firm_id} {year}) vce(cluster {cluster})",
+          "outputs": [
+            "系数路径",
+            "样本变化"
+          ],
+          "use_restrictions": [
+            "不得根据p值挑选控制组；新增或删除变量需说明混杂、坏控制、共线性或缺失值依据。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "控制变量清单",
+            "样本是否变化"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "controls_stepwise_report",
+          "title_zh": "逐步增加控制变量并列展示",
+          "source": "PDF1 p.3 方法2 方案E",
+          "source_status": "source-derived",
+          "purpose": "用嵌套模型展示系数、标准误和样本随控制变量变化的路径。",
+          "applies_to": [
+            "panel"
+          ],
+          "required_inputs": [
+            "control_blocks"
+          ],
+          "preconditions": [
+            "控制组次序有理论或数据流程依据"
+          ],
+          "procedure": [
+            "依次估计M1-Mn",
+            "保存并并列输出"
+          ],
+          "stata_code": "reghdfe {y} {x}, absorb({fe}) vce(cluster {cluster})\nestimates store m1\nreghdfe {y} {x} {core_controls}, absorb({fe}) vce(cluster {cluster})\nestimates store m2\nreghdfe {y} {x} {full_controls}, absorb({fe}) vce(cluster {cluster})\nestimates store m3\nesttab m1 m2 m3, star(* 0.1 ** 0.05 *** 0.01)",
+          "outputs": [
+            "嵌套模型表",
+            "系数稳定性"
+          ],
+          "use_restrictions": [
+            "逐步回归用于诊断和透明报告，不是自动寻找“最佳显著组合”。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "控制组增加顺序"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "name_zh": "量纲与标准化",
+      "methods": [
+        {
+          "id": "standardize_manual",
+          "title_zh": "手动z-score标准化",
+          "source": "PDF1 p.4 方法3 方案A",
+          "source_status": "source-derived",
+          "purpose": "统一量纲并增强系数可比性。",
+          "applies_to": [
+            "all"
+          ],
+          "required_inputs": [
+            "variables_to_standardize"
+          ],
+          "preconditions": [
+            "标准化范围与样本明确"
+          ],
+          "procedure": [
+            "对变量计算z-score",
+            "在相同样本上回归"
+          ],
+          "stata_code": "egen z_{y} = std({y})\negen z_{x} = std({x})\nreghdfe z_{y} z_{x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "标准化系数"
+          ],
+          "use_restrictions": [
+            "在线性回归、样本和模型不变时，线性标准化通常不改变t值和p值；不得作为“恢复显著性”的独立理由。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "标准化范围"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "主要改变经济含义和量纲；相同线性模型和样本下通常不改变t值与p值。"
+        },
+        {
+          "id": "standardized_beta_reg",
+          "title_zh": "reg, beta输出标准化系数",
+          "source": "PDF1 p.4 方法3 方案B",
+          "source_status": "source-derived",
+          "purpose": "输出标准化beta便于比较变量相对影响。",
+          "applies_to": [
+            "ols_cross_section"
+          ],
+          "required_inputs": [
+            "y",
+            "x",
+            "controls"
+          ],
+          "preconditions": [
+            "无需高维固定效应或已完成去均值处理"
+          ],
+          "procedure": [
+            "运行reg并输出beta"
+          ],
+          "stata_code": "reg {y} {x} {controls}, beta",
+          "outputs": [
+            "标准化beta"
+          ],
+          "use_restrictions": [
+            "reg, beta不能替代reghdfe的高维固定效应；模型不同会混入设定差异。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "standardize_core_only",
+          "title_zh": "仅标准化核心变量或因变量",
+          "source": "PDF1 p.4 方法3 方案C",
+          "source_status": "source-derived",
+          "purpose": "保留控制变量原尺度，同时解释标准差变化的影响。",
+          "applies_to": [
+            "all"
+          ],
+          "required_inputs": [
+            "y",
+            "x"
+          ],
+          "preconditions": [
+            "清楚说明标准化对象"
+          ],
+          "procedure": [
+            "标准化核心变量",
+            "运行原模型"
+          ],
+          "stata_code": "egen std_{x} = std({x})\negen std_{y} = std({y})\nreghdfe std_{y} std_{x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "核心变量标准化系数"
+          ],
+          "use_restrictions": [
+            "标准化前后必须使用相同估计样本，否则显著性变化可能来自样本变化。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "标准化对象"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "主要改变系数尺度；相同线性模型和样本下通常不改变t值与p值。"
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "name_zh": "固定效应与识别变异",
+      "methods": [
+        {
+          "id": "fe_firm_year",
+          "title_zh": "企业+年份固定效应",
+          "source": "PDF1 p.4 方法4 企业基础",
+          "source_status": "source-derived",
+          "purpose": "控制相应层级的时间不变或时变不可观测因素。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "fixed_effect_ids"
+          ],
+          "preconditions": [
+            "核心变量在吸收后仍有识别变异"
+          ],
+          "procedure": [
+            "估计前检查核心变量是否被完全吸收",
+            "记录singleton与样本损失"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {cluster})",
+          "outputs": [
+            "吸收后估计",
+            "被删除观测数",
+            "剩余组内变异"
+          ],
+          "use_restrictions": [
+            "固定效应越细并不一定越好；不得加入与处理完全同层的交互固定效应而消除识别。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "识别来源",
+            "被吸收变量/观测"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "fe_firm_industry_year",
+          "title_zh": "企业+行业×年份固定效应",
+          "source": "PDF1 p.4 方法4 企业进阶",
+          "source_status": "source-derived",
+          "purpose": "控制相应层级的时间不变或时变不可观测因素。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "fixed_effect_ids"
+          ],
+          "preconditions": [
+            "核心变量在吸收后仍有识别变异"
+          ],
+          "procedure": [
+            "估计前检查核心变量是否被完全吸收",
+            "记录singleton与样本损失"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {industry}#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "吸收后估计",
+            "被删除观测数",
+            "剩余组内变异"
+          ],
+          "use_restrictions": [
+            "固定效应越细并不一定越好；不得加入与处理完全同层的交互固定效应而消除识别。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "识别来源",
+            "被吸收变量/观测"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "fe_firm_province_year",
+          "title_zh": "企业+省份×年份固定效应",
+          "source": "PDF1 p.4 方法4 企业进阶",
+          "source_status": "source-derived",
+          "purpose": "控制相应层级的时间不变或时变不可观测因素。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "fixed_effect_ids"
+          ],
+          "preconditions": [
+            "核心变量在吸收后仍有识别变异"
+          ],
+          "procedure": [
+            "估计前检查核心变量是否被完全吸收",
+            "记录singleton与样本损失"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {province}#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "吸收后估计",
+            "被删除观测数",
+            "剩余组内变异"
+          ],
+          "use_restrictions": [
+            "固定效应越细并不一定越好；不得加入与处理完全同层的交互固定效应而消除识别。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "识别来源",
+            "被吸收变量/观测"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "fe_firm_industry_province_year",
+          "title_zh": "企业+行业×年份+省份×年份",
+          "source": "PDF1 p.4 方法4 企业全面",
+          "source_status": "source-derived",
+          "purpose": "控制相应层级的时间不变或时变不可观测因素。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "fixed_effect_ids"
+          ],
+          "preconditions": [
+            "核心变量在吸收后仍有识别变异"
+          ],
+          "procedure": [
+            "估计前检查核心变量是否被完全吸收",
+            "记录singleton与样本损失"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {industry}#{year} {province}#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "吸收后估计",
+            "被删除观测数",
+            "剩余组内变异"
+          ],
+          "use_restrictions": [
+            "固定效应越细并不一定越好；不得加入与处理完全同层的交互固定效应而消除识别。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "识别来源",
+            "被吸收变量/观测"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "fe_province_year",
+          "title_zh": "省份+年份固定效应",
+          "source": "PDF1 p.5 方法4 省份基础",
+          "source_status": "source-derived",
+          "purpose": "控制相应层级的时间不变或时变不可观测因素。",
+          "applies_to": [
+            "province_panel"
+          ],
+          "required_inputs": [
+            "fixed_effect_ids"
+          ],
+          "preconditions": [
+            "核心变量在吸收后仍有识别变异"
+          ],
+          "procedure": [
+            "估计前检查核心变量是否被完全吸收",
+            "记录singleton与样本损失"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({province} {year}) vce(cluster {cluster})",
+          "outputs": [
+            "吸收后估计",
+            "被删除观测数",
+            "剩余组内变异"
+          ],
+          "use_restrictions": [
+            "固定效应越细并不一定越好；不得加入与处理完全同层的交互固定效应而消除识别。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "识别来源",
+            "被吸收变量/观测"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "fe_city_province_year",
+          "title_zh": "城市+省份×年份固定效应",
+          "source": "PDF1 p.5 方法4 城市进阶",
+          "source_status": "source-derived",
+          "purpose": "控制相应层级的时间不变或时变不可观测因素。",
+          "applies_to": [
+            "city_panel"
+          ],
+          "required_inputs": [
+            "fixed_effect_ids"
+          ],
+          "preconditions": [
+            "核心变量在吸收后仍有识别变异"
+          ],
+          "procedure": [
+            "估计前检查核心变量是否被完全吸收",
+            "记录singleton与样本损失"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({city} {province}#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "吸收后估计",
+            "被删除观测数",
+            "剩余组内变异"
+          ],
+          "use_restrictions": [
+            "固定效应越细并不一定越好；不得加入与处理完全同层的交互固定效应而消除识别。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "识别来源",
+            "被吸收变量/观测"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "fe_country_region_year",
+          "title_zh": "国家+区域×年份固定效应",
+          "source": "PDF1 p.5 方法4 国家进阶",
+          "source_status": "source-derived",
+          "purpose": "控制相应层级的时间不变或时变不可观测因素。",
+          "applies_to": [
+            "country_panel"
+          ],
+          "required_inputs": [
+            "fixed_effect_ids"
+          ],
+          "preconditions": [
+            "核心变量在吸收后仍有识别变异"
+          ],
+          "procedure": [
+            "估计前检查核心变量是否被完全吸收",
+            "记录singleton与样本损失"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({country} {region}#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "吸收后估计",
+            "被删除观测数",
+            "剩余组内变异"
+          ],
+          "use_restrictions": [
+            "固定效应越细并不一定越好；不得加入与处理完全同层的交互固定效应而消除识别。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "识别来源",
+            "被吸收变量/观测"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "name_zh": "样本时期与窗口敏感性",
+      "methods": [
+        {
+          "id": "sample_start_year",
+          "title_zh": "调整样本起始年份",
+          "source": "PDF1 p.5 方法5 方案A",
+          "source_status": "source-derived",
+          "purpose": "处理数据可得性、制度口径或研究窗口问题。",
+          "applies_to": [
+            "all"
+          ],
+          "required_inputs": [
+            "start_year"
+          ],
+          "preconditions": [
+            "起始年份依据独立于结果"
+          ],
+          "procedure": [
+            "按预定起始年份截取样本"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls} if {year} >= {start_year}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "窗口敏感性结果"
+          ],
+          "use_restrictions": [
+            "不得仅因结果不显著而移动起点；需展示全样本结果。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "窗口选择依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "sample_end_year",
+          "title_zh": "调整样本截止年份",
+          "source": "PDF1 p.5 方法5 方案B",
+          "source_status": "source-derived",
+          "purpose": "处理制度变化、数据截止或后续重大冲击。",
+          "applies_to": [
+            "all"
+          ],
+          "required_inputs": [
+            "end_year"
+          ],
+          "preconditions": [
+            "截止年份有外部依据"
+          ],
+          "procedure": [
+            "截取截止年份前样本"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls} if {year} <= {end_year}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "窗口敏感性结果"
+          ],
+          "use_restrictions": [
+            "不得隐藏后续年份；需说明是否属于预设或事后分析。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "窗口选择依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "exclude_single_year",
+          "title_zh": "剔除单个特殊年份",
+          "source": "PDF1 p.5 方法5 方案C",
+          "source_status": "source-derived",
+          "purpose": "检验单一危机、股灾、疫情或口径变更年份是否驱动结果。",
+          "applies_to": [
+            "all"
+          ],
+          "required_inputs": [
+            "excluded_year"
+          ],
+          "preconditions": [
+            "年份具有明确外生异常理由"
+          ],
+          "procedure": [
+            "运行完整样本与剔除样本并列模型"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls} if {year} != {excluded_year}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "排除年份敏感性"
+          ],
+          "use_restrictions": [
+            "必须保留并报告基准；不能从多个年份中事后选择最有利的一个。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "被剔除年份及理由"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "exclude_multiple_years",
+          "title_zh": "剔除多个特殊年份",
+          "source": "PDF1 p.5 方法5 方案D",
+          "source_status": "source-derived",
+          "purpose": "检验连续异常期或多个制度断点。",
+          "applies_to": [
+            "all"
+          ],
+          "required_inputs": [
+            "excluded_years"
+          ],
+          "preconditions": [
+            "每个年份均有独立依据"
+          ],
+          "procedure": [
+            "预先列出年份",
+            "并列报告"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls} if !inlist({year}, {excluded_year_list}), absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "排除期敏感性"
+          ],
+          "use_restrictions": [
+            "年份组合不得由p值搜索；需报告删除观测比例。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "删除观测比例"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "rolling_start_window",
+          "title_zh": "滚动起始窗口回归",
+          "source": "PDF1 p.5 方法5 方案E",
+          "source_status": "source-derived",
+          "purpose": "系统展示结论随样本起始点变化的敏感性。",
+          "applies_to": [
+            "all"
+          ],
+          "required_inputs": [
+            "min_start",
+            "max_start"
+          ],
+          "preconditions": [
+            "每个窗口有足够前后期与聚类数"
+          ],
+          "procedure": [
+            "运行全部窗口",
+            "绘制系数与置信区间路径"
+          ],
+          "stata_code": "forvalues t = {min_start}/{max_start} {\n    reghdfe {y} {x} {controls} if {year} >= `t', absorb({fe}) vce(cluster {cluster})\n}",
+          "outputs": [
+            "窗口系数路径",
+            "敏感性图"
+          ],
+          "use_restrictions": [
+            "必须展示完整窗口集合，不能只展示显著窗口。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "全部尝试窗口数"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D06",
+      "name_zh": "时序、滞后与传导期",
+      "methods": [
+        {
+          "id": "lag_core_1",
+          "title_zh": "核心解释变量滞后一期",
+          "source": "PDF1 p.6 方法6 方案A",
+          "source_status": "source-derived",
+          "purpose": "允许影响传导并缓解部分反向因果担忧。",
+          "applies_to": [
+            "panel"
+          ],
+          "required_inputs": [
+            "panel_id",
+            "year",
+            "x"
+          ],
+          "preconditions": [
+            "面板已xtset",
+            "年份连续性已检查"
+          ],
+          "procedure": [
+            "用时间序列运算符或正确组内生成滞后",
+            "估计滞后效应"
+          ],
+          "stata_code": "xtset {panel_id} {year}\nreghdfe {y} L1.{x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "滞后一期系数"
+          ],
+          "use_restrictions": [
+            "滞后并不能自动解决所有内生性；不得在多个滞后中只挑显著者。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "滞后长度依据"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "lag_all_1",
+          "title_zh": "全部解释变量滞后一期",
+          "source": "PDF1 p.6 方法6 方案B",
+          "source_status": "source-derived",
+          "purpose": "使解释变量均对应前一期信息。",
+          "applies_to": [
+            "panel"
+          ],
+          "required_inputs": [
+            "x",
+            "controls"
+          ],
+          "preconditions": [
+            "控制变量的滞后具有理论意义"
+          ],
+          "procedure": [
+            "统一生成或调用L.运算符"
+          ],
+          "stata_code": "xtset {panel_id} {year}\nreghdfe {y} L1.({x} {controls}), absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "全部滞后模型"
+          ],
+          "use_restrictions": [
+            "可能显著减少样本；需区分设定变化与样本变化。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "样本损失"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "lag_core_2",
+          "title_zh": "核心解释变量滞后两期",
+          "source": "PDF1 p.6 方法6 方案C",
+          "source_status": "source-derived",
+          "purpose": "检验较长传导周期。",
+          "applies_to": [
+            "panel"
+          ],
+          "required_inputs": [
+            "x"
+          ],
+          "preconditions": [
+            "理论上存在两期传导"
+          ],
+          "procedure": [
+            "估计L2核心变量"
+          ],
+          "stata_code": "xtset {panel_id} {year}\nreghdfe {y} L2.{x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "滞后两期系数"
+          ],
+          "use_restrictions": [
+            "需同时报告L0/L1/L2或预先指定长度。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "动态路径"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "lead_outcome_1",
+          "title_zh": "被解释变量前置一期",
+          "source": "PDF1 p.6 方法6 方案D",
+          "source_status": "source-derived",
+          "purpose": "检验解释变量对未来一期结果的预测或前瞻影响。",
+          "applies_to": [
+            "panel"
+          ],
+          "required_inputs": [
+            "y",
+            "x"
+          ],
+          "preconditions": [
+            "未来结果具有研究含义"
+          ],
+          "procedure": [
+            "估计F1.y对x的关系"
+          ],
+          "stata_code": "xtset {panel_id} {year}\nreghdfe F1.{y} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "未来一期结果模型"
+          ],
+          "use_restrictions": [
+            "这不是自动的因果检验；需防止将前置结果与事件研究lead混淆。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "前置期含义"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D07",
+      "name_zh": "非线性、分布与极端值",
+      "methods": [
+        {
+          "id": "log_both_plus1",
+          "title_zh": "因变量和核心变量取ln(1+x)",
+          "source": "PDF1 pp.6-7 方法7 方案A",
+          "source_status": "source-derived",
+          "purpose": "缓解正值右偏并估计近似弹性关系。",
+          "applies_to": [
+            "positive_or_zero"
+          ],
+          "required_inputs": [
+            "y",
+            "x"
+          ],
+          "preconditions": [
+            "变量不含小于-1值",
+            "理解+1改变经济含义"
+          ],
+          "procedure": [
+            "生成ln(1+x)",
+            "回归"
+          ],
+          "stata_code": "gen ln_{y} = ln({y}+1)\ngen ln_{x} = ln({x}+1)\nreghdfe ln_{y} ln_{x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "对数模型系数"
+          ],
+          "use_restrictions": [
+            "不能为追求显著机械加1；大量零值或计数数据应评估模型匹配。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "变换前分布",
+            "零值比例"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "log_outcome_only",
+          "title_zh": "仅因变量取ln(1+y)",
+          "source": "PDF1 p.6 方法7 方案B",
+          "source_status": "source-derived",
+          "purpose": "估计x对对数结果的半弹性。",
+          "applies_to": [
+            "positive_or_zero"
+          ],
+          "required_inputs": [
+            "y"
+          ],
+          "preconditions": [
+            "结果变量适合对数解释"
+          ],
+          "procedure": [
+            "生成对数因变量"
+          ],
+          "stata_code": "gen ln_{y} = ln({y}+1)\nreghdfe ln_{y} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "半弹性估计"
+          ],
+          "use_restrictions": [
+            "必须说明系数解释和+1处理。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "quadratic_term",
+          "title_zh": "加入核心变量二次项",
+          "source": "PDF1 p.7 方法7 方案C",
+          "source_status": "source-derived",
+          "purpose": "检验U形或倒U形等非线性关系。",
+          "applies_to": [
+            "continuous_x"
+          ],
+          "required_inputs": [
+            "x"
+          ],
+          "preconditions": [
+            "理论预测非线性",
+            "x有足够支持区间"
+          ],
+          "procedure": [
+            "生成平方项",
+            "联合检验x与x²"
+          ],
+          "stata_code": "gen {x}2 = {x}^2\nreghdfe {y} {x} {x}2 {controls}, absorb({fe}) vce(cluster {cluster})\ntest {x} {x}2",
+          "outputs": [
+            "一次项",
+            "二次项",
+            "联合检验",
+            "拐点"
+          ],
+          "use_restrictions": [
+            "不能只因二次项显著便声称门槛；需报告拐点是否位于样本支持范围。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "联合检验",
+            "拐点"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "asinh_transform",
+          "title_zh": "反双曲正弦变换",
+          "source": "PDF1 p.7 方法7 方案D",
+          "source_status": "source-derived",
+          "purpose": "处理零值、负值及偏态分布。",
+          "applies_to": [
+            "continuous"
+          ],
+          "required_inputs": [
+            "y",
+            "x"
+          ],
+          "preconditions": [],
+          "procedure": [
+            "生成asinh变量",
+            "估计并解释尺度"
+          ],
+          "stata_code": "gen asinh_{y} = asinh({y})\ngen asinh_{x} = asinh({x})\nreghdfe asinh_{y} asinh_{x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "IHS模型系数"
+          ],
+          "use_restrictions": [
+            "IHS系数解释依赖变量尺度；需报告原变量单位和稳健解释。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "变量单位"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "winsorize_1_99",
+          "title_zh": "1%/99%缩尾",
+          "source": "PDF1 p.7 方法7 方案E",
+          "source_status": "source-derived",
+          "purpose": "降低极端值对估计的影响。",
+          "applies_to": [
+            "continuous"
+          ],
+          "required_inputs": [
+            "variables"
+          ],
+          "preconditions": [
+            "极端值可能是有效但高影响观测",
+            "已先排查录入错误"
+          ],
+          "procedure": [
+            "记录缩尾前分布",
+            "在1%和99%分位缩尾"
+          ],
+          "stata_code": "winsor2 {y} {x} {controls}, replace cuts(1 99)\nreghdfe {y} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "缩尾后结果",
+            "被修改观测数"
+          ],
+          "use_restrictions": [
+            "缩尾比例须预设或有文献依据；不得反复尝试比例直到显著。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "缩尾比例",
+            "被修改观测比例"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D08",
+      "name_zh": "行业分类粒度",
+      "methods": [
+        {
+          "id": "industry_fe_1digit",
+          "title_zh": "1位行业门类",
+          "source": "PDF1 p.7 方法8 方案A",
+          "source_status": "source-derived",
+          "purpose": "改变行业×年份固定效应的精细度。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "indcode"
+          ],
+          "preconditions": [
+            "行业代码格式稳定",
+            "同类文献或分类制度支持该粒度"
+          ],
+          "procedure": [
+            "截取行业代码",
+            "与年份交互吸收"
+          ],
+          "stata_code": "gen ind1 = substr(indcode,1,1)\nreghdfe {y} {x} {controls}, absorb({firm_id} {year} ind1#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "不同粒度估计"
+          ],
+          "use_restrictions": [
+            "不得寻找“既合理又显著”的档位；基准粒度应由研究对象与文献决定，其他粒度完整报告。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "行业粒度依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "industry_fe_2digit",
+          "title_zh": "2位行业大类",
+          "source": "PDF1 p.7 方法8 方案B",
+          "source_status": "source-derived",
+          "purpose": "改变行业×年份固定效应的精细度。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "indcode"
+          ],
+          "preconditions": [
+            "行业代码格式稳定",
+            "同类文献或分类制度支持该粒度"
+          ],
+          "procedure": [
+            "截取行业代码",
+            "与年份交互吸收"
+          ],
+          "stata_code": "gen ind2 = substr(indcode,1,2)\nreghdfe {y} {x} {controls}, absorb({firm_id} {year} ind2#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "不同粒度估计"
+          ],
+          "use_restrictions": [
+            "不得寻找“既合理又显著”的档位；基准粒度应由研究对象与文献决定，其他粒度完整报告。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "行业粒度依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "industry_fe_3digit",
+          "title_zh": "3位行业中类",
+          "source": "PDF1 p.7 方法8 方案C",
+          "source_status": "source-derived",
+          "purpose": "改变行业×年份固定效应的精细度。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "indcode"
+          ],
+          "preconditions": [
+            "行业代码格式稳定",
+            "同类文献或分类制度支持该粒度"
+          ],
+          "procedure": [
+            "截取行业代码",
+            "与年份交互吸收"
+          ],
+          "stata_code": "gen ind3 = substr(indcode,1,3)\nreghdfe {y} {x} {controls}, absorb({firm_id} {year} ind3#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "不同粒度估计"
+          ],
+          "use_restrictions": [
+            "不得寻找“既合理又显著”的档位；基准粒度应由研究对象与文献决定，其他粒度完整报告。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "行业粒度依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "industry_fe_4digit",
+          "title_zh": "4位行业细类",
+          "source": "PDF1 p.7 方法8 方案D",
+          "source_status": "source-derived",
+          "purpose": "改变行业×年份固定效应的精细度。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "indcode"
+          ],
+          "preconditions": [
+            "行业代码格式稳定",
+            "同类文献或分类制度支持该粒度"
+          ],
+          "procedure": [
+            "截取行业代码",
+            "与年份交互吸收"
+          ],
+          "stata_code": "gen ind4 = substr(indcode,1,4)\nreghdfe {y} {x} {controls}, absorb({firm_id} {year} ind4#{year}) vce(cluster {cluster})",
+          "outputs": [
+            "不同粒度估计"
+          ],
+          "use_restrictions": [
+            "不得寻找“既合理又显著”的档位；基准粒度应由研究对象与文献决定，其他粒度完整报告。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "行业粒度依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "industry_level_fe_no_interaction",
+          "title_zh": "行业本身固定效应、不与年份交互",
+          "source": "PDF1 p.7 方法8 方案E",
+          "source_status": "source-derived",
+          "purpose": "控制行业时间不变差异而不吸收行业时变冲击。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "indcode"
+          ],
+          "preconditions": [
+            "企业固定效应可能已吸收稳定行业归属"
+          ],
+          "procedure": [
+            "吸收企业、行业和年份"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls}, absorb({firm_id} {industry} {year}) vce(cluster {cluster})",
+          "outputs": [
+            "行业本身固定效应模型"
+          ],
+          "use_restrictions": [
+            "若企业行业不变，行业固定效应可能与企业固定效应冗余；需检查共线性。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D09",
+      "name_zh": "模型选择与识别策略",
+      "methods": [
+        {
+          "id": "quantile_regression",
+          "title_zh": "分位数回归",
+          "source": "PDF2 pp.1-2 §1.1",
+          "source_status": "source-derived",
+          "purpose": "识别核心变量在条件分布不同分位点的异质影响。",
+          "applies_to": [
+            "continuous_outcome"
+          ],
+          "required_inputs": [
+            "y",
+            "x",
+            "quantiles"
+          ],
+          "preconditions": [
+            "关注分布异质性而非仅均值"
+          ],
+          "procedure": [
+            "估计25/50/75分位",
+            "比较并绘制系数"
+          ],
+          "stata_code": "qreg {y} {x} {controls}, quantile(.25)\nqreg {y} {x} {controls}, quantile(.50)\nqreg {y} {x} {controls}, quantile(.75)",
+          "outputs": [
+            "分位点系数",
+            "系数变化图"
+          ],
+          "use_restrictions": [
+            "OLS不显著但某分位显著只能说明潜在异质性；不能用单个显著分位替代总体结论。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "全部预设分位点"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "did_family",
+          "title_zh": "双重差分DID家族",
+          "source": "PDF2 pp.1-2 §1.2",
+          "source_status": "source-derived",
+          "purpose": "利用政策冲击前后处理组与对照组差异识别平均处理效应。",
+          "applies_to": [
+            "policy_panel"
+          ],
+          "required_inputs": [
+            "unit",
+            "time",
+            "treat",
+            "post_or_first_treat",
+            "y"
+          ],
+          "preconditions": [
+            "存在外生或准外生政策冲击",
+            "平行趋势可辩护"
+          ],
+          "procedure": [
+            "区分2×2、多期与交错处理",
+            "实施平行趋势和动态效应"
+          ],
+          "stata_code": "reghdfe {y} c.{treat}#c.{post} {controls}, absorb({unit} {year}) vce(cluster {policy_level})\n* 交错处理时优先csdid/eventstudyinteract等现代估计",
+          "outputs": [
+            "ATT",
+            "动态效应",
+            "平行趋势检验"
+          ],
+          "use_restrictions": [
+            "交错DID不能机械依赖传统TWFE；先检查处理时点和对照组构成。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "处理时点结构",
+            "平行趋势"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "经典2×2 DID",
+            "多期DID",
+            "交错DID",
+            "CSDID",
+            "Sun & Abraham事件研究"
+          ]
+        },
+        {
+          "id": "rdd",
+          "title_zh": "断点回归RDD",
+          "source": "PDF2 p.2 §1.3",
+          "source_status": "source-derived",
+          "purpose": "利用阈值两侧局部可比性识别局部处理效应。",
+          "applies_to": [
+            "threshold_assignment"
+          ],
+          "required_inputs": [
+            "running_variable",
+            "cutoff",
+            "y",
+            "treatment"
+          ],
+          "preconditions": [
+            "阈值处处理概率跳跃",
+            "运行变量不可被精确操控"
+          ],
+          "procedure": [
+            "检查密度操纵",
+            "选择带宽",
+            "局部线性估计",
+            "检查协变量连续性"
+          ],
+          "stata_code": "rdrobust {y} {running}, c({cutoff})\nrddensity {running}, c({cutoff})\nrdplot {y} {running}, c({cutoff})",
+          "outputs": [
+            "局部处理效应",
+            "带宽",
+            "操纵检验"
+          ],
+          "use_restrictions": [
+            "不得仅因某带宽显著而选带宽；需报告数据驱动带宽与带宽敏感性。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "带宽",
+            "核函数",
+            "多项式阶数"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "panel_threshold",
+          "title_zh": "门槛/面板门槛模型",
+          "source": "PDF2 p.2 §1.4",
+          "source_status": "source-derived",
+          "purpose": "估计核心变量效应在门槛上下的结构差异。",
+          "applies_to": [
+            "panel",
+            "nonlinear_mechanism"
+          ],
+          "required_inputs": [
+            "threshold_variable",
+            "x",
+            "y"
+          ],
+          "preconditions": [
+            "理论预期结构变化",
+            "门槛变量有充分支持"
+          ],
+          "procedure": [
+            "bootstrap搜索门槛",
+            "由多门槛向少门槛检验"
+          ],
+          "stata_code": "xthreg {y} {controls}, rx({x}) qx({threshold_var}) thnum(1) bs(300)",
+          "outputs": [
+            "门槛值",
+            "区间系数",
+            "bootstrap检验"
+          ],
+          "use_restrictions": [
+            "门槛个数、搜索区间和bootstrap次数必须报告；不能用门槛搜索替代先验理论。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "门槛值",
+            "bootstrap次数"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "psm",
+          "title_zh": "倾向得分匹配PSM",
+          "source": "PDF2 p.2 §1.5",
+          "source_status": "source-derived",
+          "purpose": "改善处理组与对照组在可观测协变量上的可比性。",
+          "applies_to": [
+            "observational_treatment"
+          ],
+          "required_inputs": [
+            "treatment",
+            "pre_treatment_covariates",
+            "outcome"
+          ],
+          "preconditions": [
+            "可忽略性假设可辩护",
+            "共同支持"
+          ],
+          "procedure": [
+            "估计倾向得分",
+            "匹配",
+            "平衡性检验",
+            "估计处理效应"
+          ],
+          "stata_code": "teffects psmatch ({y}) ({treat} {covariates}), atet\ntebalance summarize",
+          "outputs": [
+            "匹配后平衡",
+            "ATET"
+          ],
+          "use_restrictions": [
+            "PSM不能解决不可观测混杂；匹配变量必须是处理前变量，不能只报告匹配后显著结果。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "匹配算法",
+            "共同支持",
+            "平衡性"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "heckman",
+          "title_zh": "Heckman两步法",
+          "source": "PDF2 p.2 §1.5",
+          "source_status": "source-derived",
+          "purpose": "处理结果样本被非随机选择观察的问题。",
+          "applies_to": [
+            "selected_sample"
+          ],
+          "required_inputs": [
+            "outcome",
+            "selection_indicator",
+            "exclusion_restriction"
+          ],
+          "preconditions": [
+            "存在可信排除变量"
+          ],
+          "procedure": [
+            "建立选择方程",
+            "结果方程",
+            "报告IMR"
+          ],
+          "stata_code": "heckman {y} {x} {controls}, select({selected}= {z} {selection_controls}) twostep",
+          "outputs": [
+            "结果方程系数",
+            "选择方程",
+            "IMR"
+          ],
+          "use_restrictions": [
+            "没有可信排除限制时识别主要依赖分布假设；不能仅为显著性使用。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "排除限制",
+            "IMR"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "instrumental_variables",
+          "title_zh": "工具变量IV",
+          "source": "PDF2 p.2 §1.5",
+          "source_status": "source-derived",
+          "purpose": "在有效工具变量下处理内生性。",
+          "applies_to": [
+            "endogenous_x"
+          ],
+          "required_inputs": [
+            "y",
+            "endogenous_x",
+            "instrument",
+            "controls"
+          ],
+          "preconditions": [
+            "相关性",
+            "排除限制",
+            "独立性"
+          ],
+          "procedure": [
+            "第一阶段",
+            "弱工具诊断",
+            "第二阶段",
+            "过度识别检验如适用"
+          ],
+          "stata_code": "ivreghdfe {y} ({x} = {z}) {controls}, absorb({fe}) cluster({cluster}) first",
+          "outputs": [
+            "第一阶段",
+            "2SLS系数",
+            "弱工具统计量"
+          ],
+          "use_restrictions": [
+            "工具变量选择必须独立于结果显著性；滞后变量不能自动成为有效工具。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "工具变量论证",
+            "第一阶段"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "synthetic_control",
+          "title_zh": "合成控制SCM",
+          "source": "PDF2 p.2 §1.5",
+          "source_status": "source-derived",
+          "purpose": "为单个或少数处理单元构造加权对照。",
+          "applies_to": [
+            "few_treated_units",
+            "aggregate_panel"
+          ],
+          "required_inputs": [
+            "unit",
+            "time",
+            "treated_unit",
+            "treatment_time",
+            "predictors",
+            "y"
+          ],
+          "preconditions": [
+            "有足够供体池和处理前期"
+          ],
+          "procedure": [
+            "构造合成对照",
+            "评估处理前拟合",
+            "安慰剂推断"
+          ],
+          "stata_code": "synth {y} {predictors}, trunit({treated_unit}) trperiod({treatment_time}) unitnames({unit}) timevar({year})",
+          "outputs": [
+            "处理效应路径",
+            "RMSPE",
+            "安慰剂分布"
+          ],
+          "use_restrictions": [
+            "不能只展示处理单位图；必须做空间/时间安慰剂并报告供体权重。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "供体池",
+            "权重",
+            "RMSPE"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D10",
+      "name_zh": "赋值、截断与分组",
+      "methods": [
+        {
+          "id": "binary_above_threshold",
+          "title_zh": "高于阈值赋值为1",
+          "source": "PDF2 p.3 §2 方案A",
+          "source_status": "source-derived",
+          "purpose": "将连续指标按理论或制度阈值转为二值变量。",
+          "applies_to": [
+            "continuous_variable"
+          ],
+          "required_inputs": [
+            "variable",
+            "threshold"
+          ],
+          "preconditions": [
+            "阈值来自文献、行业标准或政策文件"
+          ],
+          "procedure": [
+            "生成二值指标",
+            "保留原连续变量作敏感性"
+          ],
+          "stata_code": "gen high_{var} = ({var} > {threshold}) if !missing({var})",
+          "outputs": [
+            "二值变量",
+            "组别样本量"
+          ],
+          "use_restrictions": [
+            "不能在多个阈值中搜索最显著者；必须报告阈值依据和两组分布。"
+          ],
+          "required_reporting": [
+            "阈值来源",
+            "组别样本量",
+            "连续变量结果"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "binary_above_median",
+          "title_zh": "高于中位数赋值为1",
+          "source": "PDF2 p.3 §2 方案B",
+          "source_status": "source-derived",
+          "purpose": "按样本中位数划分高低组。",
+          "applies_to": [
+            "continuous_variable"
+          ],
+          "required_inputs": [
+            "variable"
+          ],
+          "preconditions": [
+            "分组用于描述或理论异质性"
+          ],
+          "procedure": [
+            "计算中位数",
+            "生成高组"
+          ],
+          "stata_code": "egen median_{var} = median({var})\ngen high_{var}_median = ({var} > median_{var}) if !missing({var})",
+          "outputs": [
+            "高低组"
+          ],
+          "use_restrictions": [
+            "中位数分组损失信息；若分组用于异质性，需做组间差异检验而非比较星号。"
+          ],
+          "required_reporting": [
+            "中位数",
+            "组间差异检验"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "binary_below_threshold",
+          "title_zh": "低于阈值赋值为1",
+          "source": "PDF2 p.3 §2 方案C",
+          "source_status": "source-derived",
+          "purpose": "识别小规模或低水平组。",
+          "applies_to": [
+            "continuous_variable"
+          ],
+          "required_inputs": [
+            "variable",
+            "threshold"
+          ],
+          "preconditions": [
+            "阈值有依据"
+          ],
+          "procedure": [
+            "生成低值组"
+          ],
+          "stata_code": "gen low_{var} = ({var} < {threshold}) if !missing({var})",
+          "outputs": [
+            "低值组指标"
+          ],
+          "use_restrictions": [
+            "同上；不可事后选择。"
+          ],
+          "required_reporting": [
+            "阈值来源"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "binary_in_range",
+          "title_zh": "区间内赋值为1",
+          "source": "PDF2 p.3 §2 方案D",
+          "source_status": "source-derived",
+          "purpose": "识别落在目标区间的观测。",
+          "applies_to": [
+            "continuous_variable"
+          ],
+          "required_inputs": [
+            "variable",
+            "lower",
+            "upper"
+          ],
+          "preconditions": [
+            "区间有制度或理论含义"
+          ],
+          "procedure": [
+            "使用inrange生成指标"
+          ],
+          "stata_code": "gen mid_{var} = inrange({var}, {lower}, {upper})",
+          "outputs": [
+            "区间组指标"
+          ],
+          "use_restrictions": [
+            "区间上下界必须预设；边界包含关系需说明。"
+          ],
+          "required_reporting": [
+            "区间定义",
+            "边界规则"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "quantile_categories",
+          "title_zh": "按三分位转为分类变量",
+          "source": "PDF2 p.3 §2 方案E",
+          "source_status": "source-derived",
+          "purpose": "构造低、中、高三组或其他分位组。",
+          "applies_to": [
+            "continuous_variable"
+          ],
+          "required_inputs": [
+            "variable",
+            "n_groups"
+          ],
+          "preconditions": [
+            "分组有解释价值"
+          ],
+          "procedure": [
+            "使用xtile划分",
+            "以因子变量进入模型"
+          ],
+          "stata_code": "xtile {var}_ter = {var}, n(3)\nreghdfe {y} i.{var}_ter {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "分类组系数",
+            "组别规模"
+          ],
+          "use_restrictions": [
+            "分组会损失连续信息；需报告原连续设定。"
+          ],
+          "required_reporting": [
+            "分位点",
+            "组别规模"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D11",
+      "name_zh": "核心概念的替代衡量",
+      "methods": [
+        {
+          "id": "proxy_firm_performance",
+          "title_zh": "企业绩效替代衡量",
+          "source": "PDF2 pp.4-5 §3 企业绩效",
+          "source_status": "source-derived",
+          "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
+          "applies_to": [
+            "empirical_research"
+          ],
+          "required_inputs": [
+            "concept",
+            "candidate_proxies"
+          ],
+          "preconditions": [
+            "代理变量确实测量同一概念",
+            "口径和时间可比"
+          ],
+          "procedure": [
+            "选定基准代理与2-3个替代代理",
+            "保持识别策略不变并并列估计"
+          ],
+          "stata_code": "* 根据数据字段替换 {proxy_var}\nreghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "替代代理结果矩阵",
+            "样本交集结果"
+          ],
+          "use_restrictions": [
+            "不能只报告显著代理；代理间可能测量不同维度，需解释差异；样本变化需单独诊断。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "代理变量定义",
+            "数据来源",
+            "共同样本结果"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "ROA",
+            "ROE",
+            "ROS",
+            "Tobin’s Q",
+            "股票年收益率",
+            "超额收益率",
+            "市值账面比",
+            "PCA综合绩效得分"
+          ]
+        },
+        {
+          "id": "proxy_digitalization",
+          "title_zh": "数字化转型替代衡量",
+          "source": "PDF2 p.4 §3 数字化转型",
+          "source_status": "source-derived",
+          "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
+          "applies_to": [
+            "empirical_research"
+          ],
+          "required_inputs": [
+            "concept",
+            "candidate_proxies"
+          ],
+          "preconditions": [
+            "代理变量确实测量同一概念",
+            "口径和时间可比"
+          ],
+          "procedure": [
+            "选定基准代理与2-3个替代代理",
+            "保持识别策略不变并并列估计"
+          ],
+          "stata_code": "* 根据数据字段替换 {proxy_var}\nreghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "替代代理结果矩阵",
+            "样本交集结果"
+          ],
+          "use_restrictions": [
+            "不能只报告显著代理；代理间可能测量不同维度，需解释差异；样本变化需单独诊断。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "代理变量定义",
+            "数据来源",
+            "共同样本结果"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "年报数字化关键词词频/占比",
+            "无形资产中数字化相关资产占比",
+            "CEO问卷自评数字化程度",
+            "数字化相关专利申请量"
+          ]
+        },
+        {
+          "id": "proxy_financing_constraints",
+          "title_zh": "融资约束替代衡量",
+          "source": "PDF2 p.4 §3 融资约束",
+          "source_status": "source-derived",
+          "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
+          "applies_to": [
+            "empirical_research"
+          ],
+          "required_inputs": [
+            "concept",
+            "candidate_proxies"
+          ],
+          "preconditions": [
+            "代理变量确实测量同一概念",
+            "口径和时间可比"
+          ],
+          "procedure": [
+            "选定基准代理与2-3个替代代理",
+            "保持识别策略不变并并列估计"
+          ],
+          "stata_code": "* 根据数据字段替换 {proxy_var}\nreghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "替代代理结果矩阵",
+            "样本交集结果"
+          ],
+          "use_restrictions": [
+            "不能只报告显著代理；代理间可能测量不同维度，需解释差异；样本变化需单独诊断。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "代理变量定义",
+            "数据来源",
+            "共同样本结果"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "SA指数",
+            "KZ指数",
+            "WW指数",
+            "企业规模",
+            "股利支付率"
+          ]
+        },
+        {
+          "id": "proxy_innovation",
+          "title_zh": "企业创新替代衡量",
+          "source": "PDF2 p.5 §3 企业创新",
+          "source_status": "source-derived",
+          "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
+          "applies_to": [
+            "empirical_research"
+          ],
+          "required_inputs": [
+            "concept",
+            "candidate_proxies"
+          ],
+          "preconditions": [
+            "代理变量确实测量同一概念",
+            "口径和时间可比"
+          ],
+          "procedure": [
+            "选定基准代理与2-3个替代代理",
+            "保持识别策略不变并并列估计"
+          ],
+          "stata_code": "* 根据数据字段替换 {proxy_var}\nreghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "替代代理结果矩阵",
+            "样本交集结果"
+          ],
+          "use_restrictions": [
+            "不能只报告显著代理；代理间可能测量不同维度，需解释差异；样本变化需单独诊断。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "代理变量定义",
+            "数据来源",
+            "共同样本结果"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "发明/实用新型/外观设计专利申请量",
+            "各类专利授权量",
+            "R&D支出/营业收入",
+            "新产品产值",
+            "专利数/R&D投入"
+          ]
+        },
+        {
+          "id": "proxy_environment",
+          "title_zh": "环境绩效替代衡量",
+          "source": "PDF2 p.5 §3 环境绩效",
+          "source_status": "source-derived",
+          "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
+          "applies_to": [
+            "empirical_research"
+          ],
+          "required_inputs": [
+            "concept",
+            "candidate_proxies"
+          ],
+          "preconditions": [
+            "代理变量确实测量同一概念",
+            "口径和时间可比"
+          ],
+          "procedure": [
+            "选定基准代理与2-3个替代代理",
+            "保持识别策略不变并并列估计"
+          ],
+          "stata_code": "* 根据数据字段替换 {proxy_var}\nreghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "替代代理结果矩阵",
+            "样本交集结果"
+          ],
+          "use_restrictions": [
+            "不能只报告显著代理；代理间可能测量不同维度，需解释差异；样本变化需单独诊断。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "代理变量定义",
+            "数据来源",
+            "共同样本结果"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "SO₂/COD/CO₂排放量或单位产值排放",
+            "环保投资额/营业收入",
+            "环境信用评级",
+            "绿色技术专利数量"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D12",
+      "name_zh": "综合指标与降维",
+      "methods": [
+        {
+          "id": "entropy_method",
+          "title_zh": "熵值法",
+          "source": "PDF2 p.5 §4.1",
+          "source_status": "source-derived",
+          "purpose": "按指标离散程度客观赋权。",
+          "applies_to": [
+            "composite_index"
+          ],
+          "required_inputs": [
+            "indicator_matrix",
+            "positive_negative_direction"
+          ],
+          "preconditions": [
+            "所有指标先正向化和标准化",
+            "缺失值与极端值处理已记录"
+          ],
+          "procedure": [
+            "构建综合指数",
+            "保存权重/载荷和中间数据",
+            "将替代方法作为敏感性"
+          ],
+          "stata_code": "* 具体实现依赖所选方法；参见 references/method-catalog.md 与软件包说明",
+          "outputs": [
+            "综合指数",
+            "权重或载荷",
+            "解释率/距离等诊断"
+          ],
+          "use_restrictions": [
+            "不考虑指标间相关性；对极端值敏感。",
+            "不得因最终回归显著性选择降维方法；方法应由概念结构和指标相关性决定。"
+          ],
+          "required_reporting": [
+            "指标清单",
+            "正向化方式",
+            "标准化方式",
+            "权重/载荷",
+            "综合指数分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "topsis",
+          "title_zh": "TOPSIS",
+          "source": "PDF2 pp.5-6 §4.2",
+          "source_status": "source-derived",
+          "purpose": "按与正理想解和负理想解的距离排序。",
+          "applies_to": [
+            "composite_index"
+          ],
+          "required_inputs": [
+            "indicator_matrix",
+            "positive_negative_direction"
+          ],
+          "preconditions": [
+            "所有指标先正向化和标准化",
+            "缺失值与极端值处理已记录"
+          ],
+          "procedure": [
+            "构建综合指数",
+            "保存权重/载荷和中间数据",
+            "将替代方法作为敏感性"
+          ],
+          "stata_code": "* 具体实现依赖所选方法；参见 references/method-catalog.md 与软件包说明",
+          "outputs": [
+            "综合指数",
+            "权重或载荷",
+            "解释率/距离等诊断"
+          ],
+          "use_restrictions": [
+            "适合5-15个指标；结果受标准化和权重影响。",
+            "不得因最终回归显著性选择降维方法；方法应由概念结构和指标相关性决定。"
+          ],
+          "required_reporting": [
+            "指标清单",
+            "正向化方式",
+            "标准化方式",
+            "权重/载荷",
+            "综合指数分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "critic",
+          "title_zh": "CRITIC法",
+          "source": "PDF2 p.6 §4.3",
+          "source_status": "source-derived",
+          "purpose": "结合标准差与指标冲突性赋权。",
+          "applies_to": [
+            "composite_index"
+          ],
+          "required_inputs": [
+            "indicator_matrix",
+            "positive_negative_direction"
+          ],
+          "preconditions": [
+            "所有指标先正向化和标准化",
+            "缺失值与极端值处理已记录"
+          ],
+          "procedure": [
+            "构建综合指数",
+            "保存权重/载荷和中间数据",
+            "将替代方法作为敏感性"
+          ],
+          "stata_code": "* 具体实现依赖所选方法；参见 references/method-catalog.md 与软件包说明",
+          "outputs": [
+            "综合指数",
+            "权重或载荷",
+            "解释率/距离等诊断"
+          ],
+          "use_restrictions": [
+            "需检查相关矩阵稳定性。",
+            "不得因最终回归显著性选择降维方法；方法应由概念结构和指标相关性决定。"
+          ],
+          "required_reporting": [
+            "指标清单",
+            "正向化方式",
+            "标准化方式",
+            "权重/载荷",
+            "综合指数分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "pca",
+          "title_zh": "主成分分析PCA",
+          "source": "PDF2 p.6 §4.4",
+          "source_status": "source-derived",
+          "purpose": "将相关指标压缩为少数互不相关主成分。",
+          "applies_to": [
+            "composite_index"
+          ],
+          "required_inputs": [
+            "indicator_matrix",
+            "positive_negative_direction"
+          ],
+          "preconditions": [
+            "所有指标先正向化和标准化",
+            "缺失值与极端值处理已记录"
+          ],
+          "procedure": [
+            "构建综合指数",
+            "保存权重/载荷和中间数据",
+            "将替代方法作为敏感性"
+          ],
+          "stata_code": "* 具体实现依赖所选方法；参见 references/method-catalog.md 与软件包说明",
+          "outputs": [
+            "综合指数",
+            "权重或载荷",
+            "解释率/距离等诊断"
+          ],
+          "use_restrictions": [
+            "需报告KMO、解释方差和载荷；主成分符号方向需统一。",
+            "不得因最终回归显著性选择降维方法；方法应由概念结构和指标相关性决定。"
+          ],
+          "required_reporting": [
+            "指标清单",
+            "正向化方式",
+            "标准化方式",
+            "权重/载荷",
+            "综合指数分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "factor_analysis",
+          "title_zh": "因子分析",
+          "source": "PDF2 p.6 §4.5",
+          "source_status": "source-derived",
+          "purpose": "提取潜在公共因子并允许旋转增强解释。",
+          "applies_to": [
+            "composite_index"
+          ],
+          "required_inputs": [
+            "indicator_matrix",
+            "positive_negative_direction"
+          ],
+          "preconditions": [
+            "所有指标先正向化和标准化",
+            "缺失值与极端值处理已记录"
+          ],
+          "procedure": [
+            "构建综合指数",
+            "保存权重/载荷和中间数据",
+            "将替代方法作为敏感性"
+          ],
+          "stata_code": "* 具体实现依赖所选方法；参见 references/method-catalog.md 与软件包说明",
+          "outputs": [
+            "综合指数",
+            "权重或载荷",
+            "解释率/距离等诊断"
+          ],
+          "use_restrictions": [
+            "因子命名具有主观性；需报告旋转与载荷。",
+            "不得因最终回归显著性选择降维方法；方法应由概念结构和指标相关性决定。"
+          ],
+          "required_reporting": [
+            "指标清单",
+            "正向化方式",
+            "标准化方式",
+            "权重/载荷",
+            "综合指数分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "grey_relational",
+          "title_zh": "灰色关联度分析",
+          "source": "PDF2 pp.6-7 §4.6",
+          "source_status": "source-derived",
+          "purpose": "按序列几何形状相似度评估关联。",
+          "applies_to": [
+            "composite_index"
+          ],
+          "required_inputs": [
+            "indicator_matrix",
+            "positive_negative_direction"
+          ],
+          "preconditions": [
+            "所有指标先正向化和标准化",
+            "缺失值与极端值处理已记录"
+          ],
+          "procedure": [
+            "构建综合指数",
+            "保存权重/载荷和中间数据",
+            "将替代方法作为敏感性"
+          ],
+          "stata_code": "* 具体实现依赖所选方法；参见 references/method-catalog.md 与软件包说明",
+          "outputs": [
+            "综合指数",
+            "权重或载荷",
+            "解释率/距离等诊断"
+          ],
+          "use_restrictions": [
+            "方法认可度相对有限，宜作辅助。",
+            "不得因最终回归显著性选择降维方法；方法应由概念结构和指标相关性决定。"
+          ],
+          "required_reporting": [
+            "指标清单",
+            "正向化方式",
+            "标准化方式",
+            "权重/载荷",
+            "综合指数分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "coefficient_variation",
+          "title_zh": "变异系数法",
+          "source": "PDF2 p.7 §4.7",
+          "source_status": "source-derived",
+          "purpose": "按标准差/均值衡量区分度并赋权。",
+          "applies_to": [
+            "composite_index"
+          ],
+          "required_inputs": [
+            "indicator_matrix",
+            "positive_negative_direction"
+          ],
+          "preconditions": [
+            "所有指标先正向化和标准化",
+            "缺失值与极端值处理已记录"
+          ],
+          "procedure": [
+            "构建综合指数",
+            "保存权重/载荷和中间数据",
+            "将替代方法作为敏感性"
+          ],
+          "stata_code": "* 具体实现依赖所选方法；参见 references/method-catalog.md 与软件包说明",
+          "outputs": [
+            "综合指数",
+            "权重或载荷",
+            "解释率/距离等诊断"
+          ],
+          "use_restrictions": [
+            "均值接近0时不稳定；需先消除量纲。",
+            "不得因最终回归显著性选择降维方法；方法应由概念结构和指标相关性决定。"
+          ],
+          "required_reporting": [
+            "指标清单",
+            "正向化方式",
+            "标准化方式",
+            "权重/载荷",
+            "综合指数分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D13",
+      "name_zh": "ST企业与问题样本",
+      "methods": [
+        {
+          "id": "drop_st_year",
+          "title_zh": "仅剔除ST当年",
+          "source": "PDF2 pp.7-8 §5 方案A",
+          "source_status": "source-derived",
+          "purpose": "排除企业风险警示当年的异常经营状态。",
+          "applies_to": [
+            "a_share_firm_panel"
+          ],
+          "required_inputs": [
+            "st_indicator",
+            "firm_id",
+            "year"
+          ],
+          "preconditions": [
+            "ST字段按年份准确"
+          ],
+          "procedure": [
+            "删除ST=1的年度观测"
+          ],
+          "stata_code": "drop if {st} == 1",
+          "outputs": [
+            "基准非ST样本"
+          ],
+          "use_restrictions": [
+            "需报告删除企业数和观测数；ST可能是研究结果的一部分时不得机械剔除。"
+          ],
+          "required_reporting": [
+            "删除观测数",
+            "删除企业数"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "drop_ever_st_firm",
+          "title_zh": "剔除曾经ST企业全部年份",
+          "source": "PDF2 pp.7-8 §5 方案B",
+          "source_status": "source-derived",
+          "purpose": "构造更严格的“始终正常”企业样本。",
+          "applies_to": [
+            "a_share_firm_panel"
+          ],
+          "required_inputs": [
+            "st_indicator",
+            "firm_id"
+          ],
+          "preconditions": [
+            "可承受较大样本损失"
+          ],
+          "procedure": [
+            "计算ever_st并删除企业全部观测"
+          ],
+          "stata_code": "bysort {firm_id}: egen ever_st = max({st})\ndrop if ever_st == 1",
+          "outputs": [
+            "严格非ST样本"
+          ],
+          "use_restrictions": [
+            "可能引入样本选择偏差；通常更适合作为稳健性而非唯一基准。"
+          ],
+          "required_reporting": [
+            "删除企业数",
+            "删除观测数",
+            "样本构成变化"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "st_baseline_robustness_pair",
+          "title_zh": "ST处理配对报告",
+          "source": "PDF2 p.8 折中方案",
+          "source_status": "source-derived",
+          "purpose": "基准仅剔除ST当年，稳健性剔除曾ST企业全部年份。",
+          "applies_to": [
+            "a_share_firm_panel"
+          ],
+          "required_inputs": [
+            "st_indicator"
+          ],
+          "preconditions": [],
+          "procedure": [
+            "同时运行两种ST处理",
+            "比较样本和系数"
+          ],
+          "stata_code": "* M1: drop if st==1\n* M2: by firm: egen ever_st=max(st); drop if ever_st==1",
+          "outputs": [
+            "ST处理敏感性表"
+          ],
+          "use_restrictions": [
+            "两种结果均需报告，不能只保留有利方案。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "两种样本构成"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        }
+      ]
+    },
+    {
+      "id": "D14",
+      "name_zh": "逆指标正向化",
+      "methods": [
+        {
+          "id": "inverse_reciprocal",
+          "title_zh": "倒数一致化 1/x",
+          "source": "PDF2 p.8 §6 方法1",
+          "source_status": "source-derived",
+          "purpose": "将越小越好的正值指标转为越大越好。",
+          "applies_to": [
+            "positive_inverse_indicator"
+          ],
+          "required_inputs": [
+            "x"
+          ],
+          "preconditions": [
+            "x严格大于0",
+            "不存在接近0的极端值"
+          ],
+          "procedure": [
+            "计算倒数",
+            "检查分布"
+          ],
+          "stata_code": "gen {x}_inv = 1/{x}",
+          "outputs": [
+            "正向化指标"
+          ],
+          "use_restrictions": [
+            "接近0会产生巨大值；必须先诊断并可能缩尾。"
+          ],
+          "required_reporting": [
+            "原始与转换分布"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "inverse_reciprocal_plus1",
+          "title_zh": "倒数一致化 1/(x+1)",
+          "source": "PDF2 p.8 §6 方法1扩展",
+          "source_status": "source-derived",
+          "purpose": "避免分母为0。",
+          "applies_to": [
+            "nonnegative_inverse_indicator"
+          ],
+          "required_inputs": [
+            "x"
+          ],
+          "preconditions": [
+            "+1具有尺度意义"
+          ],
+          "procedure": [
+            "计算1/(x+1)"
+          ],
+          "stata_code": "gen {x}_inv = 1/({x}+1)",
+          "outputs": [
+            "正向化指标"
+          ],
+          "use_restrictions": [
+            "+1并非无害，变量量纲改变时结果不同；需说明。"
+          ],
+          "required_reporting": [
+            "加常数依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "inverse_max_minus",
+          "title_zh": "样本最大值减原值",
+          "source": "PDF2 pp.8-9 §6 方法2",
+          "source_status": "source-derived",
+          "purpose": "保持分布形态并完成逆指标正向化。",
+          "applies_to": [
+            "inverse_indicator"
+          ],
+          "required_inputs": [
+            "x"
+          ],
+          "preconditions": [],
+          "procedure": [
+            "计算样本最大值",
+            "生成max-x"
+          ],
+          "stata_code": "egen max_{x}=max({x})\ngen good_{x}=max_{x}-{x}",
+          "outputs": [
+            "正向化指标"
+          ],
+          "use_restrictions": [
+            "样本最大值随样本变化，跨期/跨样本可比性可能受影响。"
+          ],
+          "required_reporting": [
+            "上界来源"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "inverse_fixed_upper_minus",
+          "title_zh": "固定上界减原值",
+          "source": "PDF2 p.9 §6 方法2",
+          "source_status": "source-derived",
+          "purpose": "在理论上界明确时正向化。",
+          "applies_to": [
+            "bounded_inverse_indicator"
+          ],
+          "required_inputs": [
+            "x",
+            "upper_bound"
+          ],
+          "preconditions": [
+            "上界有理论或制度依据"
+          ],
+          "procedure": [
+            "生成M-x"
+          ],
+          "stata_code": "gen good_{x}={upper_bound}-{x}",
+          "outputs": [
+            "正向化指标"
+          ],
+          "use_restrictions": [
+            "超出上界的观测需单独处理并报告。"
+          ],
+          "required_reporting": [
+            "理论上界"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。"
+        },
+        {
+          "id": "inverse_normalized_complement",
+          "title_zh": "归一化后取补数",
+          "source": "PDF2 p.9 §6 其他方法",
+          "source_status": "source-derived",
+          "purpose": "先min-max归一化，再用1-z转换方向。",
+          "applies_to": [
+            "inverse_indicator"
+          ],
+          "required_inputs": [
+            "x"
+          ],
+          "preconditions": [
+            "min与max有合理含义"
+          ],
+          "procedure": [
+            "计算min-max",
+            "取1-z"
+          ],
+          "stata_code": "summ {x}, meanonly\ngen z_{x}=({x}-r(min))/(r(max)-r(min))\ngen good_{x}=1-z_{x}",
+          "outputs": [
+            "0-1正向化指标"
+          ],
+          "use_restrictions": [
+            "极端值决定min/max；跨样本可比性有限。"
+          ],
+          "required_reporting": [
+            "min/max",
+            "异常值处理"
+          ],
+          "adjustment_level": "B",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "倒数取对数 -ln(x)",
+            "M-x极大型转换"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D15",
+      "name_zh": "样本选择与理论异质性",
+      "methods": [
+        {
+          "id": "sample_by_firm_attributes",
+          "title_zh": "按企业属性划分样本",
+          "source": "PDF2 pp.9-10 §7.1",
+          "source_status": "source-derived",
+          "purpose": "检验制度与企业特征相关的理论异质性。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "pre_treatment_firm_attributes"
+          ],
+          "preconditions": [
+            "分组变量尽量为处理前或稳定属性"
+          ],
+          "procedure": [
+            "预先定义分组或交互项",
+            "优先使用交互项和组间差异检验"
+          ],
+          "stata_code": "reghdfe {y} c.{x}##i.{group} {controls}, absorb({fe}) vce(cluster {cluster})\ntest 1.{group}#c.{x}",
+          "outputs": [
+            "异质性交互项",
+            "组间差异"
+          ],
+          "use_restrictions": [
+            "不能用“一个组显著、另一组不显著”替代正式差异检验。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "组间差异检验"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "国有企业 vs 非国有企业",
+            "大企业 vs 中小企业（中位数/三分位）",
+            "主板 vs 创业板/科创板/北交所",
+            "生命周期：成长期/成熟期/衰退期（Dickinson现金流法）"
+          ]
+        },
+        {
+          "id": "sample_by_industry",
+          "title_zh": "按行业属性划分样本",
+          "source": "PDF2 p.10 §7.2",
+          "source_status": "source-derived",
+          "purpose": "检验行业结构相关异质性。",
+          "applies_to": [
+            "firm_panel"
+          ],
+          "required_inputs": [
+            "industry_attributes"
+          ],
+          "preconditions": [
+            "行业分类有官方或文献依据"
+          ],
+          "procedure": [
+            "构造行业组或交互项",
+            "正式检验差异"
+          ],
+          "stata_code": "reghdfe {y} c.{x}##i.{industry_group} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "行业异质性"
+          ],
+          "use_restrictions": [
+            "行业组不能事后挖掘；金融业剔除与行业异质性需区分。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "行业分类依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "制造业 vs 非制造业",
+            "重污染行业 vs 非重污染行业",
+            "高科技行业 vs 传统行业",
+            "高/低行业竞争（HHI）"
+          ]
+        },
+        {
+          "id": "sample_by_region",
+          "title_zh": "按地区属性划分样本",
+          "source": "PDF2 p.10 §7.3",
+          "source_status": "source-derived",
+          "purpose": "检验区域制度、发展与政策环境异质性。",
+          "applies_to": [
+            "firm_or_city_panel"
+          ],
+          "required_inputs": [
+            "region_attributes"
+          ],
+          "preconditions": [
+            "区域分类有公开标准或稳定指数"
+          ],
+          "procedure": [
+            "构造交互或分组",
+            "报告差异检验"
+          ],
+          "stata_code": "reghdfe {y} c.{x}##i.{region_group} {controls}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "地区异质性"
+          ],
+          "use_restrictions": [
+            "市场化指数年份与样本期需匹配；地区分组不能由结果反推。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "地区分类依据"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "东中西部",
+            "长三角/珠三角/京津冀等城市群",
+            "政策试点 vs 非试点",
+            "高/低市场化程度"
+          ]
+        },
+        {
+          "id": "special_sample_restrictions",
+          "title_zh": "特殊样本筛选与剔除",
+          "source": "PDF2 p.10 §7.4",
+          "source_status": "source-derived",
+          "purpose": "检验特殊地区、行业或极端单元是否驱动结果。",
+          "applies_to": [
+            "panel"
+          ],
+          "required_inputs": [
+            "restriction_rule"
+          ],
+          "preconditions": [
+            "每项限制具有制度或数据理由"
+          ],
+          "procedure": [
+            "逐项运行而非叠加搜索",
+            "记录样本损失和构成变化"
+          ],
+          "stata_code": "reghdfe {y} {x} {controls} if {restriction_condition}, absorb({fe}) vce(cluster {cluster})",
+          "outputs": [
+            "限制样本敏感性"
+          ],
+          "use_restrictions": [
+            "不得叠加筛选直到显著；每个限制需单独报告，并保留全样本基准。"
+          ],
+          "required_reporting": [
+            "模型式",
+            "样本量N",
+            "核心系数",
+            "标准误",
+            "p值",
+            "95%置信区间",
+            "与基准模型的差异原因",
+            "删除单位和观测",
+            "限制理由"
+          ],
+          "adjustment_level": "C",
+          "expected_significance_effect": "可能改变系数、标准误或统计功效，但不保证显著。",
+          "options": [
+            "剔除直辖市",
+            "剔除省会城市",
+            "剔除西藏等特殊地区",
+            "剔除金融行业",
+            "仅保留制造业企业"
+          ]
+        }
+      ]
+    }
+  ]
+}

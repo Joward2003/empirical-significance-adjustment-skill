@@ -1,0 +1,61 @@
+{
+  "project_id": "chain-policy-supply-chain-demo",
+  "research_question": "链长制是否影响企业供应商空间进入与退出？",
+  "theory_direction": "unknown",
+  "unit_of_observation": "firm-year",
+  "panel_id": "firm_id",
+  "time_variable": "year",
+  "sample_period": {
+    "start": 2012,
+    "end": 2024
+  },
+  "outcome": {
+    "name": "interprov_entry_rate",
+    "type": "proportion",
+    "has_zeros": true,
+    "has_negatives": false,
+    "skewed": true
+  },
+  "core_exposure": {
+    "name": "treat_customer_direct_post",
+    "type": "did",
+    "assignment_level": "city-industry-firm-year",
+    "construction": "企业主营业务与所在地级市链长制产业直接匹配后，与政策实施后指标交互"
+  },
+  "baseline_specification": {
+    "controls": [
+      "Size",
+      "Age",
+      "ROA",
+      "Lev",
+      "Growth",
+      "Cashflow",
+      "TobinQ",
+      "SOE",
+      "Top1"
+    ],
+    "fixed_effects": [
+      "firm_id",
+      "industry#year"
+    ],
+    "cluster": [
+      "policy_city"
+    ],
+    "stata_code": "reghdfe interprov_entry_rate treat_customer_direct_post $controls, absorb(firm_id industry#year) vce(cluster policy_city)"
+  },
+  "diagnostic_flags": {
+    "staggered_policy": true,
+    "few_clusters": false,
+    "outcome_many_zeros": true,
+    "measurement_error_concern": true,
+    "bad_control_concern": false,
+    "special_years": true
+  },
+  "allowed_adjustment_levels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "software": "stata",
+  "notes": "演示配置。实际运行前应核对政策时点、处理赋值层级和因变量公式。"
+}

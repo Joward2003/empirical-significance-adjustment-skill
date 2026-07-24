@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Adjustment Log Entry",
+  "type": "object",
+  "required": [
+    "run_id",
+    "method_id",
+    "adjustment_level",
+    "rationale",
+    "decision_used_p_value",
+    "specification",
+    "result",
+    "status"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "method_id": {
+      "type": "string"
+    },
+    "adjustment_level": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "diagnostic_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "decision_used_p_value": {
+      "type": "boolean"
+    },
+    "specification": {
+      "type": "object"
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "beta": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "se": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "p_value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ci_low": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "ci_high": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "n": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "clusters": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "supports",
+        "directional_imprecise",
+        "sensitive",
+        "opposite",
+        "failed",
+        "not_run"
+      ]
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "code": {
+      "type": "string"
+    }
+  }
+}

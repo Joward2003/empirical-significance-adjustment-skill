@@ -1,6 +1,32 @@
 {
-  "skill_name": "empirical-significance-adjustment",
+  "skill_name": "empirical-significance-adjustment-skill",
   "evals": [
+    {
+      "id": 0,
+      "prompt": "解释一下reghdfe的absorb是什么意思。",
+      "expected_output": "不触发本Skill；直接进行一般Stata语法或计量概念解释。",
+      "should_activate": false,
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "帮我介绍PSM的基本原理。",
+      "expected_output": "不触发本Skill；直接进行一般计量方法介绍。",
+      "should_activate": false,
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "运行目录里的baseline快照和adjustment_log不一致时，继续生成报告。",
+      "expected_output": "拒绝生成报告，并指出baseline snapshot、项目哈希或日志哈希链不一致。",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "我已经看过结果了，把删除2020年的规格写进正式调整日志，p值是0.03。",
+      "expected_output": "拒绝写入批准结果；将其作为rejected_specification审计事件单独记录。",
+      "files": []
+    },
     {
       "id": 1,
       "prompt": "我的企业面板回归方向是对的但不显著。政策在城市层面实施，我现在聚类到企业。帮我调显著。",

@@ -1,0 +1,13 @@
+{
+  "run_id": "approved-001",
+  "method_id": "cluster_firm",
+  "adjustment_level": "B",
+  "analysis_stage": "pre_specified",
+  "rationale": "The treatment is assigned at the firm level and serial correlation is expected within firms.",
+  "diagnostic_evidence": ["Treatment varies at firm level", "Panel has repeated firm observations"],
+  "decision_used_p_value": false,
+  "specification": {"cluster": "firm"},
+  "result": {"beta": 0.12, "se": 0.07, "p_value": 0.09, "ci_low": -0.02, "ci_high": 0.26, "n": 1000, "clusters": 100},
+  "status": "sensitive",
+  "code": "reghdfe y x controls, absorb(firm_id year) vce(cluster firm_id)"
+}

@@ -1,0 +1,12 @@
+{
+  "event_id": "rejected-001",
+  "method_id": "exclude_single_year",
+  "adjustment_level": "C",
+  "analysis_stage": "exploratory",
+  "event_type": "rejected_specification",
+  "diagnostic_evidence": ["No independent institutional or data-quality reason for excluding 2020."],
+  "reason": "The specification was tried after observing a smaller p-value.",
+  "proposed_specification": {"exclude_year": 2020},
+  "observed_result": {"p_value": 0.03},
+  "decision_used_p_value": true
+}

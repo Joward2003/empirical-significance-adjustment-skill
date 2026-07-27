@@ -1,0 +1,13 @@
+{
+  "run_id": "baseline-001",
+  "method_id": "baseline_firm_fe",
+  "adjustment_level": "A",
+  "analysis_stage": "pre_registered",
+  "diagnostic_evidence": ["企业—年份面板键已完成预检", "基准规格在看结果前已登记"],
+  "rationale": "Baseline reproduced from the pre-registered specification.",
+  "decision_used_p_value": false,
+  "specification": {"model": "firm and year fixed effects"},
+  "result": {"beta": 0.12, "se": 0.08, "p_value": 0.14, "ci_low": -0.04, "ci_high": 0.28, "n": 1000, "clusters": 100},
+  "status": "directional_imprecise",
+  "code": "reghdfe y x controls, absorb(firm_id year) vce(cluster firm_id)"
+}

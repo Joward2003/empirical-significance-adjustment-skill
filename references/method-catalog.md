@@ -1,16 +1,13 @@
 # 方法目录：规范化显著性诊断与调整
 
-本目录把历史资料中的方法按研究决策维度重新组织。`PDF1`/`PDF2` 是待核验内部来源标签，
-不是可公开验证的引文；详见 `references/source-map.md`。每个方法均增加输入、适用前提、
-Stata示例、输出、使用限制和报告要求。
+本目录按研究决策维度组织方法。每个方法均提供输入、适用前提、Stata示例、输出、使用限制和报告要求。
 
-> 区分：**历史来源标签**仅用于追溯内部整理；**使用限制与治理规则**是本Skill为保证规范性增加的设计层。
+> 使用限制与治理规则是本Skill为保证规范性增加的设计层。
 
 ## D00 基准模型与研究层级
 
 ### `baseline_firm_fe`｜企业面板基准模板
 
-- **来源：** PDF1 p.1 §2.1
 - **调整等级：** A
 - **目的：** 建立企业—年份面板的基准固定效应模型。
 - **适用对象：** firm_panel
@@ -29,7 +26,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {firm_id})
 
 ### `baseline_province_fe`｜省份面板基准模板
 
-- **来源：** PDF1 p.1 §2.2
 - **调整等级：** A
 - **目的：** 建立省份—年份面板基准模型。
 - **适用对象：** province_panel
@@ -48,7 +44,6 @@ reghdfe {y} {x} {controls}, absorb({province} {year}) vce(cluster {province})
 
 ### `baseline_city_fe`｜城市面板基准模板
 
-- **来源：** PDF1 pp.1-2 §2.3
 - **调整等级：** A
 - **目的：** 建立城市—年份面板基准模型。
 - **适用对象：** city_panel
@@ -67,7 +62,6 @@ reghdfe {y} {x} {controls}, absorb({city} {year}) vce(cluster {city})
 
 ### `baseline_country_fe`｜国家面板基准模板
 
-- **来源：** PDF1 p.2 §2.4
 - **调整等级：** A
 - **目的：** 建立国家—年份跨国面板基准模型。
 - **适用对象：** country_panel
@@ -88,7 +82,6 @@ reghdfe {y} {x} {controls}, absorb({country} {year}) vce(cluster {country})
 
 ### `cluster_industry`｜聚类到行业层面
 
-- **来源：** PDF1 p.2 方法1 方案A
 - **调整等级：** B
 - **目的：** 允许行业内误差任意相关。
 - **适用对象：** firm_panel
@@ -107,7 +100,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {industry})
 
 ### `cluster_firm`｜聚类到企业层面
 
-- **来源：** PDF1 p.2 方法1 方案B
 - **调整等级：** B
 - **目的：** 处理同一企业跨期误差相关。
 - **适用对象：** firm_panel
@@ -126,7 +118,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {firm_id})
 
 ### `cluster_firm_year`｜企业与年份双向聚类
 
-- **来源：** PDF1 p.3 方法1 方案C
 - **调整等级：** B
 - **目的：** 同时允许企业内序列相关和年份共同冲击。
 - **适用对象：** firm_panel
@@ -145,7 +136,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {firm_id} {year
 
 ### `cluster_province_year`｜聚类到省份×年份交互
 
-- **来源：** PDF1 p.3 方法1 方案D
 - **调整等级：** C
 - **目的：** 允许同一省份—年份单元内误差相关。
 - **适用对象：** firm_panel
@@ -164,7 +154,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {province}#{yea
 
 ### `vce_robust`｜异方差稳健标准误、不聚类
 
-- **来源：** PDF1 p.3 方法1 方案E
 - **调整等级：** D
 - **目的：** 仅修正异方差。
 - **适用对象：** cross_section, panel
@@ -183,7 +172,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(robust)
 
 ### `wild_cluster_bootstrap`｜少聚类wild cluster bootstrap
 
-- **来源：** PDF1 pp.1-2 关键点
 - **调整等级：** B
 - **目的：** 在聚类数量偏少时改善有限样本推断。
 - **适用对象：** province_panel, few_cluster_policy
@@ -205,7 +193,6 @@ boottest {x}, cluster({cluster}) reps(9999) seed(20260724)
 
 ### `controls_none`｜不加入控制变量
 
-- **来源：** PDF1 p.3 方法2 方案A
 - **调整等级：** B
 - **目的：** 比较控制变量设定对核心估计的影响。
 - **适用对象：** firm_panel, city_panel, province_panel
@@ -224,7 +211,6 @@ reghdfe {y} {x} , absorb({firm_id} {year}) vce(cluster {cluster})
 
 ### `controls_core`｜仅加入核心控制变量
 
-- **来源：** PDF1 p.3 方法2 方案B
 - **调整等级：** B
 - **目的：** 比较控制变量设定对核心估计的影响。
 - **适用对象：** firm_panel, city_panel, province_panel
@@ -243,7 +229,6 @@ reghdfe {y} {x} size lev, absorb({firm_id} {year}) vce(cluster {cluster})
 
 ### `controls_baseline`｜基准控制变量组
 
-- **来源：** PDF1 p.3 方法2 方案C
 - **调整等级：** B
 - **目的：** 比较控制变量设定对核心估计的影响。
 - **适用对象：** firm_panel, city_panel, province_panel
@@ -262,7 +247,6 @@ reghdfe {y} {x} size lev roa growth, absorb({firm_id} {year}) vce(cluster {clust
 
 ### `controls_full`｜全套控制变量组
 
-- **来源：** PDF1 p.3 方法2 方案D
 - **调整等级：** B
 - **目的：** 比较控制变量设定对核心估计的影响。
 - **适用对象：** firm_panel, city_panel, province_panel
@@ -281,7 +265,6 @@ reghdfe {y} {x} size lev roa growth age bm cashflow tangibility, absorb({firm_id
 
 ### `controls_stepwise_report`｜逐步增加控制变量并列展示
 
-- **来源：** PDF1 p.3 方法2 方案E
 - **调整等级：** B
 - **目的：** 用嵌套模型展示系数、标准误和样本随控制变量变化的路径。
 - **适用对象：** panel
@@ -308,7 +291,6 @@ esttab m1 m2 m3, star(* 0.1 ** 0.05 *** 0.01)
 
 ### `standardize_manual`｜手动z-score标准化
 
-- **来源：** PDF1 p.4 方法3 方案A
 - **调整等级：** C
 - **目的：** 统一量纲并增强系数可比性。
 - **适用对象：** all
@@ -329,7 +311,6 @@ reghdfe z_{y} z_{x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `standardized_beta_reg`｜reg, beta输出标准化系数
 
-- **来源：** PDF1 p.4 方法3 方案B
 - **调整等级：** C
 - **目的：** 输出标准化beta便于比较变量相对影响。
 - **适用对象：** ols_cross_section
@@ -348,7 +329,6 @@ reg {y} {x} {controls}, beta
 
 ### `standardize_core_only`｜仅标准化核心变量或因变量
 
-- **来源：** PDF1 p.4 方法3 方案C
 - **调整等级：** C
 - **目的：** 保留控制变量原尺度，同时解释标准差变化的影响。
 - **适用对象：** all
@@ -371,7 +351,6 @@ reghdfe std_{y} std_{x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `fe_firm_year`｜企业+年份固定效应
 
-- **来源：** PDF1 p.4 方法4 企业基础
 - **调整等级：** B
 - **目的：** 控制相应层级的时间不变或时变不可观测因素。
 - **适用对象：** firm_panel
@@ -390,7 +369,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year}) vce(cluster {cluster})
 
 ### `fe_firm_industry_year`｜企业+行业×年份固定效应
 
-- **来源：** PDF1 p.4 方法4 企业进阶
 - **调整等级：** B
 - **目的：** 控制相应层级的时间不变或时变不可观测因素。
 - **适用对象：** firm_panel
@@ -409,7 +387,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {industry}#{year}) vce(cluster {clu
 
 ### `fe_firm_province_year`｜企业+省份×年份固定效应
 
-- **来源：** PDF1 p.4 方法4 企业进阶
 - **调整等级：** B
 - **目的：** 控制相应层级的时间不变或时变不可观测因素。
 - **适用对象：** firm_panel
@@ -428,7 +405,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {province}#{year}) vce(cluster {clu
 
 ### `fe_firm_industry_province_year`｜企业+行业×年份+省份×年份
 
-- **来源：** PDF1 p.4 方法4 企业全面
 - **调整等级：** B
 - **目的：** 控制相应层级的时间不变或时变不可观测因素。
 - **适用对象：** firm_panel
@@ -447,7 +423,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {industry}#{year} {province}#{year}
 
 ### `fe_province_year`｜省份+年份固定效应
 
-- **来源：** PDF1 p.5 方法4 省份基础
 - **调整等级：** B
 - **目的：** 控制相应层级的时间不变或时变不可观测因素。
 - **适用对象：** province_panel
@@ -466,7 +441,6 @@ reghdfe {y} {x} {controls}, absorb({province} {year}) vce(cluster {cluster})
 
 ### `fe_city_province_year`｜城市+省份×年份固定效应
 
-- **来源：** PDF1 p.5 方法4 城市进阶
 - **调整等级：** B
 - **目的：** 控制相应层级的时间不变或时变不可观测因素。
 - **适用对象：** city_panel
@@ -485,7 +459,6 @@ reghdfe {y} {x} {controls}, absorb({city} {province}#{year}) vce(cluster {cluste
 
 ### `fe_country_region_year`｜国家+区域×年份固定效应
 
-- **来源：** PDF1 p.5 方法4 国家进阶
 - **调整等级：** B
 - **目的：** 控制相应层级的时间不变或时变不可观测因素。
 - **适用对象：** country_panel
@@ -506,7 +479,6 @@ reghdfe {y} {x} {controls}, absorb({country} {region}#{year}) vce(cluster {clust
 
 ### `sample_start_year`｜调整样本起始年份
 
-- **来源：** PDF1 p.5 方法5 方案A
 - **调整等级：** C
 - **目的：** 处理数据可得性、制度口径或研究窗口问题。
 - **适用对象：** all
@@ -525,7 +497,6 @@ reghdfe {y} {x} {controls} if {year} >= {start_year}, absorb({fe}) vce(cluster {
 
 ### `sample_end_year`｜调整样本截止年份
 
-- **来源：** PDF1 p.5 方法5 方案B
 - **调整等级：** C
 - **目的：** 处理制度变化、数据截止或后续重大冲击。
 - **适用对象：** all
@@ -544,7 +515,6 @@ reghdfe {y} {x} {controls} if {year} <= {end_year}, absorb({fe}) vce(cluster {cl
 
 ### `exclude_single_year`｜剔除单个特殊年份
 
-- **来源：** PDF1 p.5 方法5 方案C
 - **调整等级：** C
 - **目的：** 检验单一危机、股灾、疫情或口径变更年份是否驱动结果。
 - **适用对象：** all
@@ -563,7 +533,6 @@ reghdfe {y} {x} {controls} if {year} != {excluded_year}, absorb({fe}) vce(cluste
 
 ### `exclude_multiple_years`｜剔除多个特殊年份
 
-- **来源：** PDF1 p.5 方法5 方案D
 - **调整等级：** C
 - **目的：** 检验连续异常期或多个制度断点。
 - **适用对象：** all
@@ -582,7 +551,6 @@ reghdfe {y} {x} {controls} if !inlist({year}, {excluded_year_list}), absorb({fe}
 
 ### `rolling_start_window`｜滚动起始窗口回归
 
-- **来源：** PDF1 p.5 方法5 方案E
 - **调整等级：** B
 - **目的：** 系统展示结论随样本起始点变化的敏感性。
 - **适用对象：** all
@@ -605,7 +573,6 @@ forvalues t = {min_start}/{max_start} {
 
 ### `lag_core_1`｜核心解释变量滞后一期
 
-- **来源：** PDF1 p.6 方法6 方案A
 - **调整等级：** B
 - **目的：** 允许影响传导并缓解部分反向因果担忧。
 - **适用对象：** panel
@@ -625,7 +592,6 @@ reghdfe {y} L1.{x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `lag_all_1`｜全部解释变量滞后一期
 
-- **来源：** PDF1 p.6 方法6 方案B
 - **调整等级：** B
 - **目的：** 使解释变量均对应前一期信息。
 - **适用对象：** panel
@@ -645,7 +611,6 @@ reghdfe {y} L1.({x} {controls}), absorb({fe}) vce(cluster {cluster})
 
 ### `lag_core_2`｜核心解释变量滞后两期
 
-- **来源：** PDF1 p.6 方法6 方案C
 - **调整等级：** C
 - **目的：** 检验较长传导周期。
 - **适用对象：** panel
@@ -665,7 +630,6 @@ reghdfe {y} L2.{x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `lead_outcome_1`｜被解释变量前置一期
 
-- **来源：** PDF1 p.6 方法6 方案D
 - **调整等级：** C
 - **目的：** 检验解释变量对未来一期结果的预测或前瞻影响。
 - **适用对象：** panel
@@ -687,7 +651,6 @@ reghdfe F1.{y} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `log_both_plus1`｜因变量和核心变量取ln(1+x)
 
-- **来源：** PDF1 pp.6-7 方法7 方案A
 - **调整等级：** B
 - **目的：** 缓解正值右偏并估计近似弹性关系。
 - **适用对象：** positive_or_zero
@@ -708,7 +671,6 @@ reghdfe ln_{y} ln_{x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `log_outcome_only`｜仅因变量取ln(1+y)
 
-- **来源：** PDF1 p.6 方法7 方案B
 - **调整等级：** B
 - **目的：** 估计x对对数结果的半弹性。
 - **适用对象：** positive_or_zero
@@ -728,7 +690,6 @@ reghdfe ln_{y} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `quadratic_term`｜加入核心变量二次项
 
-- **来源：** PDF1 p.7 方法7 方案C
 - **调整等级：** C
 - **目的：** 检验U形或倒U形等非线性关系。
 - **适用对象：** continuous_x
@@ -749,7 +710,6 @@ test {x} {x}2
 
 ### `asinh_transform`｜反双曲正弦变换
 
-- **来源：** PDF1 p.7 方法7 方案D
 - **调整等级：** B
 - **目的：** 处理零值、负值及偏态分布。
 - **适用对象：** continuous
@@ -770,7 +730,6 @@ reghdfe asinh_{y} asinh_{x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `winsorize_1_99`｜1%/99%缩尾
 
-- **来源：** PDF1 p.7 方法7 方案E
 - **调整等级：** B
 - **目的：** 降低极端值对估计的影响。
 - **适用对象：** continuous
@@ -792,7 +751,6 @@ reghdfe {y} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `industry_fe_1digit`｜1位行业门类
 
-- **来源：** PDF1 p.7 方法8 方案A
 - **调整等级：** C
 - **目的：** 改变行业×年份固定效应的精细度。
 - **适用对象：** firm_panel
@@ -812,7 +770,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year} ind1#{year}) vce(cluster {cl
 
 ### `industry_fe_2digit`｜2位行业大类
 
-- **来源：** PDF1 p.7 方法8 方案B
 - **调整等级：** C
 - **目的：** 改变行业×年份固定效应的精细度。
 - **适用对象：** firm_panel
@@ -832,7 +789,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year} ind2#{year}) vce(cluster {cl
 
 ### `industry_fe_3digit`｜3位行业中类
 
-- **来源：** PDF1 p.7 方法8 方案C
 - **调整等级：** C
 - **目的：** 改变行业×年份固定效应的精细度。
 - **适用对象：** firm_panel
@@ -852,7 +808,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year} ind3#{year}) vce(cluster {cl
 
 ### `industry_fe_4digit`｜4位行业细类
 
-- **来源：** PDF1 p.7 方法8 方案D
 - **调整等级：** C
 - **目的：** 改变行业×年份固定效应的精细度。
 - **适用对象：** firm_panel
@@ -872,7 +827,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {year} ind4#{year}) vce(cluster {cl
 
 ### `industry_level_fe_no_interaction`｜行业本身固定效应、不与年份交互
 
-- **来源：** PDF1 p.7 方法8 方案E
 - **调整等级：** C
 - **目的：** 控制行业时间不变差异而不吸收行业时变冲击。
 - **适用对象：** firm_panel
@@ -893,7 +847,6 @@ reghdfe {y} {x} {controls}, absorb({firm_id} {industry} {year}) vce(cluster {clu
 
 ### `quantile_regression`｜分位数回归
 
-- **来源：** PDF2 pp.1-2 §1.1
 - **调整等级：** C
 - **目的：** 识别核心变量在条件分布不同分位点的异质影响。
 - **适用对象：** continuous_outcome
@@ -914,12 +867,11 @@ qreg {y} {x} {controls}, quantile(.75)
 
 ### `did_family`｜双重差分DID家族
 
-- **来源：** PDF2 pp.1-2 §1.2
 - **调整等级：** B
 - **目的：** 利用政策冲击前后处理组与对照组差异识别平均处理效应。
 - **适用对象：** policy_panel
 - **必要输入：** unit, time, treat, post_or_first_treat, y
-- **PDF列举的选项：** 经典2×2 DID；多期DID；交错DID；CSDID；Sun & Abraham事件研究
+- **可选规格：** 经典2×2 DID；多期DID；交错DID；CSDID；Sun & Abraham事件研究
 - **前提：** 存在外生或准外生政策冲击；平行趋势可辩护
 - **执行：** 区分2×2、多期与交错处理；实施平行趋势和动态效应
 
@@ -935,7 +887,6 @@ reghdfe {y} c.{treat}#c.{post} {controls}, absorb({unit} {year}) vce(cluster {po
 
 ### `rdd`｜断点回归RDD
 
-- **来源：** PDF2 p.2 §1.3
 - **调整等级：** B
 - **目的：** 利用阈值两侧局部可比性识别局部处理效应。
 - **适用对象：** threshold_assignment
@@ -956,7 +907,6 @@ rdplot {y} {running}, c({cutoff})
 
 ### `panel_threshold`｜门槛/面板门槛模型
 
-- **来源：** PDF2 p.2 §1.4
 - **调整等级：** C
 - **目的：** 估计核心变量效应在门槛上下的结构差异。
 - **适用对象：** panel, nonlinear_mechanism
@@ -975,7 +925,6 @@ xthreg {y} {controls}, rx({x}) qx({threshold_var}) thnum(1) bs(300)
 
 ### `psm`｜倾向得分匹配PSM
 
-- **来源：** PDF2 p.2 §1.5
 - **调整等级：** C
 - **目的：** 改善处理组与对照组在可观测协变量上的可比性。
 - **适用对象：** observational_treatment
@@ -995,7 +944,6 @@ tebalance summarize
 
 ### `heckman`｜Heckman两步法
 
-- **来源：** PDF2 p.2 §1.5
 - **调整等级：** C
 - **目的：** 处理结果样本被非随机选择观察的问题。
 - **适用对象：** selected_sample
@@ -1014,7 +962,6 @@ heckman {y} {x} {controls}, select({selected}= {z} {selection_controls}) twostep
 
 ### `instrumental_variables`｜工具变量IV
 
-- **来源：** PDF2 p.2 §1.5
 - **调整等级：** B
 - **目的：** 在有效工具变量下处理内生性。
 - **适用对象：** endogenous_x
@@ -1033,7 +980,6 @@ ivreghdfe {y} ({x} = {z}) {controls}, absorb({fe}) cluster({cluster}) first
 
 ### `synthetic_control`｜合成控制SCM
 
-- **来源：** PDF2 p.2 §1.5
 - **调整等级：** B
 - **目的：** 为单个或少数处理单元构造加权对照。
 - **适用对象：** few_treated_units, aggregate_panel
@@ -1054,7 +1000,6 @@ synth {y} {predictors}, trunit({treated_unit}) trperiod({treatment_time}) unitna
 
 ### `binary_above_threshold`｜高于阈值赋值为1
 
-- **来源：** PDF2 p.3 §2 方案A
 - **调整等级：** C
 - **目的：** 将连续指标按理论或制度阈值转为二值变量。
 - **适用对象：** continuous_variable
@@ -1073,7 +1018,6 @@ gen high_{var} = ({var} > {threshold}) if !missing({var})
 
 ### `binary_above_median`｜高于中位数赋值为1
 
-- **来源：** PDF2 p.3 §2 方案B
 - **调整等级：** C
 - **目的：** 按样本中位数划分高低组。
 - **适用对象：** continuous_variable
@@ -1093,7 +1037,6 @@ gen high_{var}_median = ({var} > median_{var}) if !missing({var})
 
 ### `binary_below_threshold`｜低于阈值赋值为1
 
-- **来源：** PDF2 p.3 §2 方案C
 - **调整等级：** C
 - **目的：** 识别小规模或低水平组。
 - **适用对象：** continuous_variable
@@ -1112,7 +1055,6 @@ gen low_{var} = ({var} < {threshold}) if !missing({var})
 
 ### `binary_in_range`｜区间内赋值为1
 
-- **来源：** PDF2 p.3 §2 方案D
 - **调整等级：** C
 - **目的：** 识别落在目标区间的观测。
 - **适用对象：** continuous_variable
@@ -1131,7 +1073,6 @@ gen mid_{var} = inrange({var}, {lower}, {upper})
 
 ### `quantile_categories`｜按三分位转为分类变量
 
-- **来源：** PDF2 p.3 §2 方案E
 - **调整等级：** C
 - **目的：** 构造低、中、高三组或其他分位组。
 - **适用对象：** continuous_variable
@@ -1153,12 +1094,11 @@ reghdfe {y} i.{var}_ter {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `proxy_firm_performance`｜企业绩效替代衡量
 
-- **来源：** PDF2 pp.4-5 §3 企业绩效
 - **调整等级：** B
 - **目的：** 用不同代理变量检验同一经济概念的测量稳健性。
 - **适用对象：** empirical_research
 - **必要输入：** concept, candidate_proxies
-- **PDF列举的选项：** ROA；ROE；ROS；Tobin’s Q；股票年收益率；超额收益率；市值账面比；PCA综合绩效得分
+- **可选规格：** ROA；ROE；ROS；Tobin’s Q；股票年收益率；超额收益率；市值账面比；PCA综合绩效得分
 - **前提：** 代理变量确实测量同一概念；口径和时间可比
 - **执行：** 选定基准代理与2-3个替代代理；保持识别策略不变并并列估计
 
@@ -1174,12 +1114,11 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `proxy_digitalization`｜数字化转型替代衡量
 
-- **来源：** PDF2 p.4 §3 数字化转型
 - **调整等级：** B
 - **目的：** 用不同代理变量检验同一经济概念的测量稳健性。
 - **适用对象：** empirical_research
 - **必要输入：** concept, candidate_proxies
-- **PDF列举的选项：** 年报数字化关键词词频/占比；无形资产中数字化相关资产占比；CEO问卷自评数字化程度；数字化相关专利申请量
+- **可选规格：** 年报数字化关键词词频/占比；无形资产中数字化相关资产占比；CEO问卷自评数字化程度；数字化相关专利申请量
 - **前提：** 代理变量确实测量同一概念；口径和时间可比
 - **执行：** 选定基准代理与2-3个替代代理；保持识别策略不变并并列估计
 
@@ -1195,12 +1134,11 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `proxy_financing_constraints`｜融资约束替代衡量
 
-- **来源：** PDF2 p.4 §3 融资约束
 - **调整等级：** B
 - **目的：** 用不同代理变量检验同一经济概念的测量稳健性。
 - **适用对象：** empirical_research
 - **必要输入：** concept, candidate_proxies
-- **PDF列举的选项：** SA指数；KZ指数；WW指数；企业规模；股利支付率
+- **可选规格：** SA指数；KZ指数；WW指数；企业规模；股利支付率
 - **前提：** 代理变量确实测量同一概念；口径和时间可比
 - **执行：** 选定基准代理与2-3个替代代理；保持识别策略不变并并列估计
 
@@ -1216,12 +1154,11 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `proxy_innovation`｜企业创新替代衡量
 
-- **来源：** PDF2 p.5 §3 企业创新
 - **调整等级：** B
 - **目的：** 用不同代理变量检验同一经济概念的测量稳健性。
 - **适用对象：** empirical_research
 - **必要输入：** concept, candidate_proxies
-- **PDF列举的选项：** 发明/实用新型/外观设计专利申请量；各类专利授权量；R&D支出/营业收入；新产品产值；专利数/R&D投入
+- **可选规格：** 发明/实用新型/外观设计专利申请量；各类专利授权量；R&D支出/营业收入；新产品产值；专利数/R&D投入
 - **前提：** 代理变量确实测量同一概念；口径和时间可比
 - **执行：** 选定基准代理与2-3个替代代理；保持识别策略不变并并列估计
 
@@ -1237,12 +1174,11 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `proxy_environment`｜环境绩效替代衡量
 
-- **来源：** PDF2 p.5 §3 环境绩效
 - **调整等级：** B
 - **目的：** 用不同代理变量检验同一经济概念的测量稳健性。
 - **适用对象：** empirical_research
 - **必要输入：** concept, candidate_proxies
-- **PDF列举的选项：** SO₂/COD/CO₂排放量或单位产值排放；环保投资额/营业收入；环境信用评级；绿色技术专利数量
+- **可选规格：** SO₂/COD/CO₂排放量或单位产值排放；环保投资额/营业收入；环境信用评级；绿色技术专利数量
 - **前提：** 代理变量确实测量同一概念；口径和时间可比
 - **执行：** 选定基准代理与2-3个替代代理；保持识别策略不变并并列估计
 
@@ -1260,7 +1196,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `entropy_method`｜熵值法
 
-- **来源：** PDF2 p.5 §4.1
 - **调整等级：** B
 - **目的：** 按指标离散程度客观赋权。
 - **适用对象：** composite_index
@@ -1279,7 +1214,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `topsis`｜TOPSIS
 
-- **来源：** PDF2 pp.5-6 §4.2
 - **调整等级：** B
 - **目的：** 按与正理想解和负理想解的距离排序。
 - **适用对象：** composite_index
@@ -1298,7 +1232,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `critic`｜CRITIC法
 
-- **来源：** PDF2 p.6 §4.3
 - **调整等级：** B
 - **目的：** 结合标准差与指标冲突性赋权。
 - **适用对象：** composite_index
@@ -1317,7 +1250,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `pca`｜主成分分析PCA
 
-- **来源：** PDF2 p.6 §4.4
 - **调整等级：** B
 - **目的：** 将相关指标压缩为少数互不相关主成分。
 - **适用对象：** composite_index
@@ -1336,7 +1268,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `factor_analysis`｜因子分析
 
-- **来源：** PDF2 p.6 §4.5
 - **调整等级：** B
 - **目的：** 提取潜在公共因子并允许旋转增强解释。
 - **适用对象：** composite_index
@@ -1355,7 +1286,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `grey_relational`｜灰色关联度分析
 
-- **来源：** PDF2 pp.6-7 §4.6
 - **调整等级：** B
 - **目的：** 按序列几何形状相似度评估关联。
 - **适用对象：** composite_index
@@ -1374,7 +1304,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `coefficient_variation`｜变异系数法
 
-- **来源：** PDF2 p.7 §4.7
 - **调整等级：** B
 - **目的：** 按标准差/均值衡量区分度并赋权。
 - **适用对象：** composite_index
@@ -1395,7 +1324,6 @@ reghdfe {proxy_var} {x} {controls}, absorb({fe}) vce(cluster {cluster})
 
 ### `drop_st_year`｜仅剔除ST当年
 
-- **来源：** PDF2 pp.7-8 §5 方案A
 - **调整等级：** B
 - **目的：** 排除企业风险警示当年的异常经营状态。
 - **适用对象：** a_share_firm_panel
@@ -1414,7 +1342,6 @@ drop if {st} == 1
 
 ### `drop_ever_st_firm`｜剔除曾经ST企业全部年份
 
-- **来源：** PDF2 pp.7-8 §5 方案B
 - **调整等级：** C
 - **目的：** 构造更严格的“始终正常”企业样本。
 - **适用对象：** a_share_firm_panel
@@ -1434,7 +1361,6 @@ drop if ever_st == 1
 
 ### `st_baseline_robustness_pair`｜ST处理配对报告
 
-- **来源：** PDF2 p.8 折中方案
 - **调整等级：** B
 - **目的：** 基准仅剔除ST当年，稳健性剔除曾ST企业全部年份。
 - **适用对象：** a_share_firm_panel
@@ -1456,7 +1382,6 @@ drop if ever_st == 1
 
 ### `inverse_reciprocal`｜倒数一致化 1/x
 
-- **来源：** PDF2 p.8 §6 方法1
 - **调整等级：** B
 - **目的：** 将越小越好的正值指标转为越大越好。
 - **适用对象：** positive_inverse_indicator
@@ -1475,7 +1400,6 @@ gen {x}_inv = 1/{x}
 
 ### `inverse_reciprocal_plus1`｜倒数一致化 1/(x+1)
 
-- **来源：** PDF2 p.8 §6 方法1扩展
 - **调整等级：** C
 - **目的：** 避免分母为0。
 - **适用对象：** nonnegative_inverse_indicator
@@ -1494,7 +1418,6 @@ gen {x}_inv = 1/({x}+1)
 
 ### `inverse_max_minus`｜样本最大值减原值
 
-- **来源：** PDF2 pp.8-9 §6 方法2
 - **调整等级：** B
 - **目的：** 保持分布形态并完成逆指标正向化。
 - **适用对象：** inverse_indicator
@@ -1514,7 +1437,6 @@ gen good_{x}=max_{x}-{x}
 
 ### `inverse_fixed_upper_minus`｜固定上界减原值
 
-- **来源：** PDF2 p.9 §6 方法2
 - **调整等级：** B
 - **目的：** 在理论上界明确时正向化。
 - **适用对象：** bounded_inverse_indicator
@@ -1533,12 +1455,11 @@ gen good_{x}={upper_bound}-{x}
 
 ### `inverse_normalized_complement`｜归一化后取补数
 
-- **来源：** PDF2 p.9 §6 其他方法
 - **调整等级：** B
 - **目的：** 先min-max归一化，再用1-z转换方向。
 - **适用对象：** inverse_indicator
 - **必要输入：** x
-- **PDF列举的选项：** 倒数取对数 -ln(x)；M-x极大型转换
+- **可选规格：** 倒数取对数 -ln(x)；M-x极大型转换
 - **前提：** min与max有合理含义
 - **执行：** 计算min-max；取1-z
 
@@ -1557,12 +1478,11 @@ gen good_{x}=1-z_{x}
 
 ### `sample_by_firm_attributes`｜按企业属性划分样本
 
-- **来源：** PDF2 pp.9-10 §7.1
 - **调整等级：** C
 - **目的：** 检验制度与企业特征相关的理论异质性。
 - **适用对象：** firm_panel
 - **必要输入：** pre_treatment_firm_attributes
-- **PDF列举的选项：** 国有企业 vs 非国有企业；大企业 vs 中小企业（中位数/三分位）；主板 vs 创业板/科创板/北交所；生命周期：成长期/成熟期/衰退期（Dickinson现金流法）
+- **可选规格：** 国有企业 vs 非国有企业；大企业 vs 中小企业（中位数/三分位）；主板 vs 创业板/科创板/北交所；生命周期：成长期/成熟期/衰退期（Dickinson现金流法）
 - **前提：** 分组变量尽量为处理前或稳定属性
 - **执行：** 预先定义分组或交互项；优先使用交互项和组间差异检验
 
@@ -1578,12 +1498,11 @@ test 1.{group}#c.{x}
 
 ### `sample_by_industry`｜按行业属性划分样本
 
-- **来源：** PDF2 p.10 §7.2
 - **调整等级：** C
 - **目的：** 检验行业结构相关异质性。
 - **适用对象：** firm_panel
 - **必要输入：** industry_attributes
-- **PDF列举的选项：** 制造业 vs 非制造业；重污染行业 vs 非重污染行业；高科技行业 vs 传统行业；高/低行业竞争（HHI）
+- **可选规格：** 制造业 vs 非制造业；重污染行业 vs 非重污染行业；高科技行业 vs 传统行业；高/低行业竞争（HHI）
 - **前提：** 行业分类有官方或文献依据
 - **执行：** 构造行业组或交互项；正式检验差异
 
@@ -1598,12 +1517,11 @@ reghdfe {y} c.{x}##i.{industry_group} {controls}, absorb({fe}) vce(cluster {clus
 
 ### `sample_by_region`｜按地区属性划分样本
 
-- **来源：** PDF2 p.10 §7.3
 - **调整等级：** C
 - **目的：** 检验区域制度、发展与政策环境异质性。
 - **适用对象：** firm_or_city_panel
 - **必要输入：** region_attributes
-- **PDF列举的选项：** 东中西部；长三角/珠三角/京津冀等城市群；政策试点 vs 非试点；高/低市场化程度
+- **可选规格：** 东中西部；长三角/珠三角/京津冀等城市群；政策试点 vs 非试点；高/低市场化程度
 - **前提：** 区域分类有公开标准或稳定指数
 - **执行：** 构造交互或分组；报告差异检验
 
@@ -1618,12 +1536,11 @@ reghdfe {y} c.{x}##i.{region_group} {controls}, absorb({fe}) vce(cluster {cluste
 
 ### `special_sample_restrictions`｜特殊样本筛选与剔除
 
-- **来源：** PDF2 p.10 §7.4
 - **调整等级：** C
 - **目的：** 检验特殊地区、行业或极端单元是否驱动结果。
 - **适用对象：** panel
 - **必要输入：** restriction_rule
-- **PDF列举的选项：** 剔除直辖市；剔除省会城市；剔除西藏等特殊地区；剔除金融行业；仅保留制造业企业
+- **可选规格：** 剔除直辖市；剔除省会城市；剔除西藏等特殊地区；剔除金融行业；仅保留制造业企业
 - **前提：** 每项限制具有制度或数据理由
 - **执行：** 逐项运行而非叠加搜索；记录样本损失和构成变化
 

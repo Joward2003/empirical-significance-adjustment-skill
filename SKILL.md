@@ -11,7 +11,7 @@ compatibility: >-
   Requires Python 3.9+ and the dependency listed in requirements.txt for audit scripts;
   generated Stata code requires user-side Stata and method-specific community packages.
 metadata:
-  version: 1.1.0
+  version: 1.1.1
   language: zh-CN
   domain: empirical-economics
 ---
@@ -32,7 +32,6 @@ p值的诊断或理论依据，不能把“显著”作为规格选择目标。
 1. 读取 `references/decision-rules.md`，确定调整等级和边界。
 2. 根据问题维度读取 `references/method-catalog.md`；需要机器筛选时读取 `references/method-registry.json`。
 3. 需要生成最终材料时读取 `references/reporting-and-audit.md`、`references/audit-model.md` 和 `assets/final-report-template.md`。
-4. 用户追问方法是否来自原文时读取 `references/source-map.md`。
 
 ## 必要输入
 

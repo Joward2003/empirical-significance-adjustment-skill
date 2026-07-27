@@ -81,11 +81,6 @@ SHA-256 哈希是文件内容的“数字指纹”。本项目用它绑定项目
 的一方伪造整套记录。具体边界与外部存档建议见 [审计模型](references/audit-model.md) 和
 [安全政策](SECURITY.md)。
 
-## 方法来源
-
-方法注册表含 81 个可调用方法。历史 `PDF1`/`PDF2` 标签目前没有可核验书目信息，不应被
-视为公开引用；发布前应依 [source-map.md](references/source-map.md) 补录来源。
-
 ## 开发与贡献
 
 ```bash

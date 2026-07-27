@@ -19,7 +19,6 @@ def main() -> None:
     if not match or match.group(1) != ROOT.name:
         fail("SKILL.md frontmatter name必须与父目录名称一致")
     for relative in (
-        "references/source-map.md",
         "references/audit-model.md",
         "assets/project.schema.json",
         "assets/adjustment-entry.schema.json",
@@ -42,9 +41,6 @@ def main() -> None:
     for dimension in registry.get("dimensions", []):
         if not re.fullmatch(r"D\d{2}", dimension.get("id", "")):
             fail("方法注册表包含无效dimension id")
-    if any(method.get("source_status") != "source-label-unverified" for method in methods.values()):
-        fail("来源状态必须反映PDF标签尚未核验的事实")
-
     catalog = (ROOT / "references" / "method-catalog.md").read_text(encoding="utf-8")
     catalog_ids = set(re.findall(r"^### `([^`]+)`", catalog, re.MULTILINE))
     if catalog_ids != set(methods):

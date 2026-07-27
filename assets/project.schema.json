@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Empirical Significance Adjustment Project",
+  "title": "Empirical Inference Diagnostics Project",
   "type": "object",
   "required": [
     "project_id",
@@ -14,10 +14,12 @@
   ],
   "properties": {
     "project_id": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "research_question": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "theory_direction": {
       "enum": [
@@ -28,7 +30,8 @@
       ]
     },
     "unit_of_observation": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "panel_id": {
       "type": "string"
@@ -138,6 +141,14 @@
           "type": "string"
         }
       }
+    },
+    "pre_analysis_plan": {
+      "type": "string",
+      "minLength": 1
+    },
+    "multiple_testing_plan": {
+      "type": "string",
+      "minLength": 1
     },
     "diagnostic_flags": {
       "type": "object",

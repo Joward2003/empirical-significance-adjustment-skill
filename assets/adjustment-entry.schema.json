@@ -1,115 +1,55 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Adjustment Log Entry",
+  "title": "Approved Adjustment Log Entry",
+  "description": "A planned and approved estimation run. P-value-selected specifications belong in audit-event.schema.json, not here.",
   "type": "object",
   "required": [
     "run_id",
     "method_id",
     "adjustment_level",
+    "analysis_stage",
+    "diagnostic_evidence",
     "rationale",
     "decision_used_p_value",
     "specification",
     "result",
-    "status"
+    "status",
+    "code"
   ],
   "properties": {
-    "run_id": {
-      "type": "string"
-    },
-    "timestamp": {
-      "type": "string"
-    },
-    "method_id": {
-      "type": "string"
-    },
-    "adjustment_level": {
-      "enum": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ]
-    },
+    "run_id": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "method_id": {"type": "string", "minLength": 1},
+    "adjustment_level": {"enum": ["A", "B", "C", "D"]},
+    "analysis_stage": {"enum": ["pre_registered", "pre_specified", "exploratory"]},
     "diagnostic_evidence": {
       "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
     },
-    "rationale": {
-      "type": "string"
-    },
-    "decision_used_p_value": {
-      "type": "boolean"
-    },
-    "specification": {
-      "type": "object"
-    },
+    "rationale": {"type": "string", "minLength": 1},
+    "decision_used_p_value": {"type": "boolean", "const": false},
+    "specification": {"type": "object", "minProperties": 1},
     "result": {
       "type": "object",
+      "required": ["beta", "se", "p_value", "ci_low", "ci_high", "n", "clusters"],
       "properties": {
-        "beta": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "se": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "p_value": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "ci_low": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "ci_high": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "n": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
-        "clusters": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        }
+        "beta": {"type": ["number", "null"]},
+        "se": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "p_value": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "ci_low": {"type": ["number", "null"]},
+        "ci_high": {"type": ["number", "null"]},
+        "n": {"type": ["integer", "null"], "minimum": 1},
+        "clusters": {"type": ["integer", "null"], "minimum": 1}
       }
     },
     "status": {
-      "enum": [
-        "supports",
-        "directional_imprecise",
-        "sensitive",
-        "opposite",
-        "failed",
-        "not_run"
-      ]
+      "enum": ["supports", "directional_imprecise", "sensitive", "opposite", "failed", "not_run"]
     },
     "warnings": {
       "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "items": {"type": "string", "minLength": 1}
     },
-    "code": {
-      "type": "string"
-    }
+    "code": {"type": "string", "minLength": 1}
   }
 }

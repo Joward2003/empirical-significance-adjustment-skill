@@ -1,10 +1,10 @@
 {
-  "registry_version": "1.0.0",
-  "skill_name": "empirical-significance-adjustment",
+  "registry_version": "1.1.0",
+  "skill_name": "empirical-significance-adjustment-skill",
   "source_policy": {
-    "pdf_content": "所有PDF中的方法均被保留并映射到维度；原文的“调显著”叙述不等同于本Skill的决策规则。",
+    "pdf_content": "历史PDF标签仅作为待核验内部来源标记；原文的“调显著”叙述不等同于本Skill的决策规则。",
     "governance_layer": "每个方法附加使用限制、输入输出和报告字段。限制属于设计增强，不是PDF原文逐字内容。",
-    "selection_rule": "允许主动诊断并改善统计显著性，但不得仅依据p值选择模型、样本、聚类、控制变量或指标。"
+    "selection_rule": "允许主动诊断并改善估计准确性、统计功效和推断可靠性，但不得仅依据p值选择模型、样本、聚类、控制变量或指标。"
   },
   "adjustment_levels": {
     "A": "数据纠错或基准复现：优先且通常允许自动执行。",
@@ -21,7 +21,7 @@
           "id": "baseline_firm_fe",
           "title_zh": "企业面板基准模板",
           "source": "PDF1 p.1 §2.1",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "建立企业—年份面板的基准固定效应模型。",
           "applies_to": [
             "firm_panel"
@@ -65,7 +65,7 @@
           "id": "baseline_province_fe",
           "title_zh": "省份面板基准模板",
           "source": "PDF1 p.1 §2.2",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "建立省份—年份面板基准模型。",
           "applies_to": [
             "province_panel"
@@ -109,7 +109,7 @@
           "id": "baseline_city_fe",
           "title_zh": "城市面板基准模板",
           "source": "PDF1 pp.1-2 §2.3",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "建立城市—年份面板基准模型。",
           "applies_to": [
             "city_panel"
@@ -150,7 +150,7 @@
           "id": "baseline_country_fe",
           "title_zh": "国家面板基准模板",
           "source": "PDF1 p.2 §2.4",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "建立国家—年份跨国面板基准模型。",
           "applies_to": [
             "country_panel"
@@ -198,7 +198,7 @@
           "id": "cluster_industry",
           "title_zh": "聚类到行业层面",
           "source": "PDF1 p.2 方法1 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "允许行业内误差任意相关。",
           "applies_to": [
             "firm_panel"
@@ -240,7 +240,7 @@
           "id": "cluster_firm",
           "title_zh": "聚类到企业层面",
           "source": "PDF1 p.2 方法1 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "处理同一企业跨期误差相关。",
           "applies_to": [
             "firm_panel"
@@ -279,7 +279,7 @@
           "id": "cluster_firm_year",
           "title_zh": "企业与年份双向聚类",
           "source": "PDF1 p.3 方法1 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "同时允许企业内序列相关和年份共同冲击。",
           "applies_to": [
             "firm_panel"
@@ -319,7 +319,7 @@
           "id": "cluster_province_year",
           "title_zh": "聚类到省份×年份交互",
           "source": "PDF1 p.3 方法1 方案D",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "允许同一省份—年份单元内误差相关。",
           "applies_to": [
             "firm_panel"
@@ -358,7 +358,7 @@
           "id": "vce_robust",
           "title_zh": "异方差稳健标准误、不聚类",
           "source": "PDF1 p.3 方法1 方案E",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "仅修正异方差。",
           "applies_to": [
             "cross_section",
@@ -394,7 +394,7 @@
           "id": "wild_cluster_bootstrap",
           "title_zh": "少聚类wild cluster bootstrap",
           "source": "PDF1 pp.1-2 关键点",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "在聚类数量偏少时改善有限样本推断。",
           "applies_to": [
             "province_panel",
@@ -444,7 +444,7 @@
           "id": "controls_none",
           "title_zh": "不加入控制变量",
           "source": "PDF1 p.3 方法2 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "比较控制变量设定对核心估计的影响。",
           "applies_to": [
             "firm_panel",
@@ -488,7 +488,7 @@
           "id": "controls_core",
           "title_zh": "仅加入核心控制变量",
           "source": "PDF1 p.3 方法2 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "比较控制变量设定对核心估计的影响。",
           "applies_to": [
             "firm_panel",
@@ -532,7 +532,7 @@
           "id": "controls_baseline",
           "title_zh": "基准控制变量组",
           "source": "PDF1 p.3 方法2 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "比较控制变量设定对核心估计的影响。",
           "applies_to": [
             "firm_panel",
@@ -576,7 +576,7 @@
           "id": "controls_full",
           "title_zh": "全套控制变量组",
           "source": "PDF1 p.3 方法2 方案D",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "比较控制变量设定对核心估计的影响。",
           "applies_to": [
             "firm_panel",
@@ -620,7 +620,7 @@
           "id": "controls_stepwise_report",
           "title_zh": "逐步增加控制变量并列展示",
           "source": "PDF1 p.3 方法2 方案E",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "用嵌套模型展示系数、标准误和样本随控制变量变化的路径。",
           "applies_to": [
             "panel"
@@ -666,7 +666,7 @@
           "id": "standardize_manual",
           "title_zh": "手动z-score标准化",
           "source": "PDF1 p.4 方法3 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "统一量纲并增强系数可比性。",
           "applies_to": [
             "all"
@@ -705,7 +705,7 @@
           "id": "standardized_beta_reg",
           "title_zh": "reg, beta输出标准化系数",
           "source": "PDF1 p.4 方法3 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "输出标准化beta便于比较变量相对影响。",
           "applies_to": [
             "ols_cross_section"
@@ -744,7 +744,7 @@
           "id": "standardize_core_only",
           "title_zh": "仅标准化核心变量或因变量",
           "source": "PDF1 p.4 方法3 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "保留控制变量原尺度，同时解释标准差变化的影响。",
           "applies_to": [
             "all"
@@ -790,7 +790,7 @@
           "id": "fe_firm_year",
           "title_zh": "企业+年份固定效应",
           "source": "PDF1 p.4 方法4 企业基础",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制相应层级的时间不变或时变不可观测因素。",
           "applies_to": [
             "firm_panel"
@@ -832,7 +832,7 @@
           "id": "fe_firm_industry_year",
           "title_zh": "企业+行业×年份固定效应",
           "source": "PDF1 p.4 方法4 企业进阶",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制相应层级的时间不变或时变不可观测因素。",
           "applies_to": [
             "firm_panel"
@@ -874,7 +874,7 @@
           "id": "fe_firm_province_year",
           "title_zh": "企业+省份×年份固定效应",
           "source": "PDF1 p.4 方法4 企业进阶",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制相应层级的时间不变或时变不可观测因素。",
           "applies_to": [
             "firm_panel"
@@ -916,7 +916,7 @@
           "id": "fe_firm_industry_province_year",
           "title_zh": "企业+行业×年份+省份×年份",
           "source": "PDF1 p.4 方法4 企业全面",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制相应层级的时间不变或时变不可观测因素。",
           "applies_to": [
             "firm_panel"
@@ -958,7 +958,7 @@
           "id": "fe_province_year",
           "title_zh": "省份+年份固定效应",
           "source": "PDF1 p.5 方法4 省份基础",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制相应层级的时间不变或时变不可观测因素。",
           "applies_to": [
             "province_panel"
@@ -1000,7 +1000,7 @@
           "id": "fe_city_province_year",
           "title_zh": "城市+省份×年份固定效应",
           "source": "PDF1 p.5 方法4 城市进阶",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制相应层级的时间不变或时变不可观测因素。",
           "applies_to": [
             "city_panel"
@@ -1042,7 +1042,7 @@
           "id": "fe_country_region_year",
           "title_zh": "国家+区域×年份固定效应",
           "source": "PDF1 p.5 方法4 国家进阶",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制相应层级的时间不变或时变不可观测因素。",
           "applies_to": [
             "country_panel"
@@ -1090,7 +1090,7 @@
           "id": "sample_start_year",
           "title_zh": "调整样本起始年份",
           "source": "PDF1 p.5 方法5 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "处理数据可得性、制度口径或研究窗口问题。",
           "applies_to": [
             "all"
@@ -1128,7 +1128,7 @@
           "id": "sample_end_year",
           "title_zh": "调整样本截止年份",
           "source": "PDF1 p.5 方法5 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "处理制度变化、数据截止或后续重大冲击。",
           "applies_to": [
             "all"
@@ -1166,7 +1166,7 @@
           "id": "exclude_single_year",
           "title_zh": "剔除单个特殊年份",
           "source": "PDF1 p.5 方法5 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验单一危机、股灾、疫情或口径变更年份是否驱动结果。",
           "applies_to": [
             "all"
@@ -1204,7 +1204,7 @@
           "id": "exclude_multiple_years",
           "title_zh": "剔除多个特殊年份",
           "source": "PDF1 p.5 方法5 方案D",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验连续异常期或多个制度断点。",
           "applies_to": [
             "all"
@@ -1243,7 +1243,7 @@
           "id": "rolling_start_window",
           "title_zh": "滚动起始窗口回归",
           "source": "PDF1 p.5 方法5 方案E",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "系统展示结论随样本起始点变化的敏感性。",
           "applies_to": [
             "all"
@@ -1290,7 +1290,7 @@
           "id": "lag_core_1",
           "title_zh": "核心解释变量滞后一期",
           "source": "PDF1 p.6 方法6 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "允许影响传导并缓解部分反向因果担忧。",
           "applies_to": [
             "panel"
@@ -1332,7 +1332,7 @@
           "id": "lag_all_1",
           "title_zh": "全部解释变量滞后一期",
           "source": "PDF1 p.6 方法6 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "使解释变量均对应前一期信息。",
           "applies_to": [
             "panel"
@@ -1371,7 +1371,7 @@
           "id": "lag_core_2",
           "title_zh": "核心解释变量滞后两期",
           "source": "PDF1 p.6 方法6 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验较长传导周期。",
           "applies_to": [
             "panel"
@@ -1409,7 +1409,7 @@
           "id": "lead_outcome_1",
           "title_zh": "被解释变量前置一期",
           "source": "PDF1 p.6 方法6 方案D",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验解释变量对未来一期结果的预测或前瞻影响。",
           "applies_to": [
             "panel"
@@ -1454,7 +1454,7 @@
           "id": "log_both_plus1",
           "title_zh": "因变量和核心变量取ln(1+x)",
           "source": "PDF1 pp.6-7 方法7 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "缓解正值右偏并估计近似弹性关系。",
           "applies_to": [
             "positive_or_zero"
@@ -1496,7 +1496,7 @@
           "id": "log_outcome_only",
           "title_zh": "仅因变量取ln(1+y)",
           "source": "PDF1 p.6 方法7 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "估计x对对数结果的半弹性。",
           "applies_to": [
             "positive_or_zero"
@@ -1533,7 +1533,7 @@
           "id": "quadratic_term",
           "title_zh": "加入核心变量二次项",
           "source": "PDF1 p.7 方法7 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验U形或倒U形等非线性关系。",
           "applies_to": [
             "continuous_x"
@@ -1577,7 +1577,7 @@
           "id": "asinh_transform",
           "title_zh": "反双曲正弦变换",
           "source": "PDF1 p.7 方法7 方案D",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "处理零值、负值及偏态分布。",
           "applies_to": [
             "continuous"
@@ -1615,7 +1615,7 @@
           "id": "winsorize_1_99",
           "title_zh": "1%/99%缩尾",
           "source": "PDF1 p.7 方法7 方案E",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "降低极端值对估计的影响。",
           "applies_to": [
             "continuous"
@@ -1663,7 +1663,7 @@
           "id": "industry_fe_1digit",
           "title_zh": "1位行业门类",
           "source": "PDF1 p.7 方法8 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "改变行业×年份固定效应的精细度。",
           "applies_to": [
             "firm_panel"
@@ -1703,7 +1703,7 @@
           "id": "industry_fe_2digit",
           "title_zh": "2位行业大类",
           "source": "PDF1 p.7 方法8 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "改变行业×年份固定效应的精细度。",
           "applies_to": [
             "firm_panel"
@@ -1743,7 +1743,7 @@
           "id": "industry_fe_3digit",
           "title_zh": "3位行业中类",
           "source": "PDF1 p.7 方法8 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "改变行业×年份固定效应的精细度。",
           "applies_to": [
             "firm_panel"
@@ -1783,7 +1783,7 @@
           "id": "industry_fe_4digit",
           "title_zh": "4位行业细类",
           "source": "PDF1 p.7 方法8 方案D",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "改变行业×年份固定效应的精细度。",
           "applies_to": [
             "firm_panel"
@@ -1823,7 +1823,7 @@
           "id": "industry_level_fe_no_interaction",
           "title_zh": "行业本身固定效应、不与年份交互",
           "source": "PDF1 p.7 方法8 方案E",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "控制行业时间不变差异而不吸收行业时变冲击。",
           "applies_to": [
             "firm_panel"
@@ -1866,7 +1866,7 @@
           "id": "quantile_regression",
           "title_zh": "分位数回归",
           "source": "PDF2 pp.1-2 §1.1",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "识别核心变量在条件分布不同分位点的异质影响。",
           "applies_to": [
             "continuous_outcome"
@@ -1908,7 +1908,7 @@
           "id": "did_family",
           "title_zh": "双重差分DID家族",
           "source": "PDF2 pp.1-2 §1.2",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "利用政策冲击前后处理组与对照组差异识别平均处理效应。",
           "applies_to": [
             "policy_panel"
@@ -1962,7 +1962,7 @@
           "id": "rdd",
           "title_zh": "断点回归RDD",
           "source": "PDF2 p.2 §1.3",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "利用阈值两侧局部可比性识别局部处理效应。",
           "applies_to": [
             "threshold_assignment"
@@ -2011,7 +2011,7 @@
           "id": "panel_threshold",
           "title_zh": "门槛/面板门槛模型",
           "source": "PDF2 p.2 §1.4",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "估计核心变量效应在门槛上下的结构差异。",
           "applies_to": [
             "panel",
@@ -2057,7 +2057,7 @@
           "id": "psm",
           "title_zh": "倾向得分匹配PSM",
           "source": "PDF2 p.2 §1.5",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "改善处理组与对照组在可观测协变量上的可比性。",
           "applies_to": [
             "observational_treatment"
@@ -2104,7 +2104,7 @@
           "id": "heckman",
           "title_zh": "Heckman两步法",
           "source": "PDF2 p.2 §1.5",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "处理结果样本被非随机选择观察的问题。",
           "applies_to": [
             "selected_sample"
@@ -2149,7 +2149,7 @@
           "id": "instrumental_variables",
           "title_zh": "工具变量IV",
           "source": "PDF2 p.2 §1.5",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "在有效工具变量下处理内生性。",
           "applies_to": [
             "endogenous_x"
@@ -2198,7 +2198,7 @@
           "id": "synthetic_control",
           "title_zh": "合成控制SCM",
           "source": "PDF2 p.2 §1.5",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "为单个或少数处理单元构造加权对照。",
           "applies_to": [
             "few_treated_units",
@@ -2254,7 +2254,7 @@
           "id": "binary_above_threshold",
           "title_zh": "高于阈值赋值为1",
           "source": "PDF2 p.3 §2 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "将连续指标按理论或制度阈值转为二值变量。",
           "applies_to": [
             "continuous_variable"
@@ -2290,7 +2290,7 @@
           "id": "binary_above_median",
           "title_zh": "高于中位数赋值为1",
           "source": "PDF2 p.3 §2 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "按样本中位数划分高低组。",
           "applies_to": [
             "continuous_variable"
@@ -2323,7 +2323,7 @@
           "id": "binary_below_threshold",
           "title_zh": "低于阈值赋值为1",
           "source": "PDF2 p.3 §2 方案C",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "识别小规模或低水平组。",
           "applies_to": [
             "continuous_variable"
@@ -2355,7 +2355,7 @@
           "id": "binary_in_range",
           "title_zh": "区间内赋值为1",
           "source": "PDF2 p.3 §2 方案D",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "识别落在目标区间的观测。",
           "applies_to": [
             "continuous_variable"
@@ -2389,7 +2389,7 @@
           "id": "quantile_categories",
           "title_zh": "按三分位转为分类变量",
           "source": "PDF2 p.3 §2 方案E",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "构造低、中、高三组或其他分位组。",
           "applies_to": [
             "continuous_variable"
@@ -2430,7 +2430,7 @@
           "id": "proxy_firm_performance",
           "title_zh": "企业绩效替代衡量",
           "source": "PDF2 pp.4-5 §3 企业绩效",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
           "applies_to": [
             "empirical_research"
@@ -2484,7 +2484,7 @@
           "id": "proxy_digitalization",
           "title_zh": "数字化转型替代衡量",
           "source": "PDF2 p.4 §3 数字化转型",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
           "applies_to": [
             "empirical_research"
@@ -2534,7 +2534,7 @@
           "id": "proxy_financing_constraints",
           "title_zh": "融资约束替代衡量",
           "source": "PDF2 p.4 §3 融资约束",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
           "applies_to": [
             "empirical_research"
@@ -2585,7 +2585,7 @@
           "id": "proxy_innovation",
           "title_zh": "企业创新替代衡量",
           "source": "PDF2 p.5 §3 企业创新",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
           "applies_to": [
             "empirical_research"
@@ -2636,7 +2636,7 @@
           "id": "proxy_environment",
           "title_zh": "环境绩效替代衡量",
           "source": "PDF2 p.5 §3 环境绩效",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "用不同代理变量检验同一经济概念的测量稳健性。",
           "applies_to": [
             "empirical_research"
@@ -2692,7 +2692,7 @@
           "id": "entropy_method",
           "title_zh": "熵值法",
           "source": "PDF2 p.5 §4.1",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "按指标离散程度客观赋权。",
           "applies_to": [
             "composite_index"
@@ -2734,7 +2734,7 @@
           "id": "topsis",
           "title_zh": "TOPSIS",
           "source": "PDF2 pp.5-6 §4.2",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "按与正理想解和负理想解的距离排序。",
           "applies_to": [
             "composite_index"
@@ -2776,7 +2776,7 @@
           "id": "critic",
           "title_zh": "CRITIC法",
           "source": "PDF2 p.6 §4.3",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "结合标准差与指标冲突性赋权。",
           "applies_to": [
             "composite_index"
@@ -2818,7 +2818,7 @@
           "id": "pca",
           "title_zh": "主成分分析PCA",
           "source": "PDF2 p.6 §4.4",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "将相关指标压缩为少数互不相关主成分。",
           "applies_to": [
             "composite_index"
@@ -2860,7 +2860,7 @@
           "id": "factor_analysis",
           "title_zh": "因子分析",
           "source": "PDF2 p.6 §4.5",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "提取潜在公共因子并允许旋转增强解释。",
           "applies_to": [
             "composite_index"
@@ -2902,7 +2902,7 @@
           "id": "grey_relational",
           "title_zh": "灰色关联度分析",
           "source": "PDF2 pp.6-7 §4.6",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "按序列几何形状相似度评估关联。",
           "applies_to": [
             "composite_index"
@@ -2944,7 +2944,7 @@
           "id": "coefficient_variation",
           "title_zh": "变异系数法",
           "source": "PDF2 p.7 §4.7",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "按标准差/均值衡量区分度并赋权。",
           "applies_to": [
             "composite_index"
@@ -2992,7 +2992,7 @@
           "id": "drop_st_year",
           "title_zh": "仅剔除ST当年",
           "source": "PDF2 pp.7-8 §5 方案A",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "排除企业风险警示当年的异常经营状态。",
           "applies_to": [
             "a_share_firm_panel"
@@ -3026,7 +3026,7 @@
           "id": "drop_ever_st_firm",
           "title_zh": "剔除曾经ST企业全部年份",
           "source": "PDF2 pp.7-8 §5 方案B",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "构造更严格的“始终正常”企业样本。",
           "applies_to": [
             "a_share_firm_panel"
@@ -3060,7 +3060,7 @@
           "id": "st_baseline_robustness_pair",
           "title_zh": "ST处理配对报告",
           "source": "PDF2 p.8 折中方案",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "基准仅剔除ST当年，稳健性剔除曾ST企业全部年份。",
           "applies_to": [
             "a_share_firm_panel"
@@ -3103,7 +3103,7 @@
           "id": "inverse_reciprocal",
           "title_zh": "倒数一致化 1/x",
           "source": "PDF2 p.8 §6 方法1",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "将越小越好的正值指标转为越大越好。",
           "applies_to": [
             "positive_inverse_indicator"
@@ -3136,7 +3136,7 @@
           "id": "inverse_reciprocal_plus1",
           "title_zh": "倒数一致化 1/(x+1)",
           "source": "PDF2 p.8 §6 方法1扩展",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "避免分母为0。",
           "applies_to": [
             "nonnegative_inverse_indicator"
@@ -3167,7 +3167,7 @@
           "id": "inverse_max_minus",
           "title_zh": "样本最大值减原值",
           "source": "PDF2 pp.8-9 §6 方法2",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "保持分布形态并完成逆指标正向化。",
           "applies_to": [
             "inverse_indicator"
@@ -3197,7 +3197,7 @@
           "id": "inverse_fixed_upper_minus",
           "title_zh": "固定上界减原值",
           "source": "PDF2 p.9 §6 方法2",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "在理论上界明确时正向化。",
           "applies_to": [
             "bounded_inverse_indicator"
@@ -3229,7 +3229,7 @@
           "id": "inverse_normalized_complement",
           "title_zh": "归一化后取补数",
           "source": "PDF2 p.9 §6 其他方法",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "先min-max归一化，再用1-z转换方向。",
           "applies_to": [
             "inverse_indicator"
@@ -3272,7 +3272,7 @@
           "id": "sample_by_firm_attributes",
           "title_zh": "按企业属性划分样本",
           "source": "PDF2 pp.9-10 §7.1",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验制度与企业特征相关的理论异质性。",
           "applies_to": [
             "firm_panel"
@@ -3318,7 +3318,7 @@
           "id": "sample_by_industry",
           "title_zh": "按行业属性划分样本",
           "source": "PDF2 p.10 §7.2",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验行业结构相关异质性。",
           "applies_to": [
             "firm_panel"
@@ -3363,7 +3363,7 @@
           "id": "sample_by_region",
           "title_zh": "按地区属性划分样本",
           "source": "PDF2 p.10 §7.3",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验区域制度、发展与政策环境异质性。",
           "applies_to": [
             "firm_or_city_panel"
@@ -3408,7 +3408,7 @@
           "id": "special_sample_restrictions",
           "title_zh": "特殊样本筛选与剔除",
           "source": "PDF2 p.10 §7.4",
-          "source_status": "source-derived",
+          "source_status": "source-label-unverified",
           "purpose": "检验特殊地区、行业或极端单元是否驱动结果。",
           "applies_to": [
             "panel"

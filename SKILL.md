@@ -1,15 +1,17 @@
 ---
-name: empirical-significance-adjustment
+name: empirical-significance-adjustment-skill
 description: >-
-  规范化诊断并调整实证研究中的不显著结果。用户提到回归不显著、星号不足、调显著、
-  Stata/reghdfe、固定效应、聚类标准误、控制变量、样本窗口、滞后、替代变量、缩尾、
-  DID/RDD/IV/PSM/门槛/分位数回归、ST企业、综合指数或稳健性检验时，应使用本Skill。
-  本Skill允许以提高估计准确性、统计功效和合理显著性为目标，但要求先诊断、后调整，
-  完整记录全部尝试，不得仅根据p值选择或隐藏模型。
-license: MIT for original code and structure; source-derived notes retain original rights.
-compatibility: Requires Python 3.9+ for audit scripts; Stata code examples require user-side Stata and relevant community packages.
+  诊断实证研究中不显著、方向不稳定或对模型设定敏感的估计结果，并生成透明、
+  可复现的统计推断、稳健性分析和规格审计方案。仅当用户询问回归为何不显著、
+  标准误异常、系数对控制变量、固定效应、聚类、滞后或样本窗口敏感时使用。
+  不用于一般Stata语法教学或一般计量方法介绍，不得仅依据p值选择模型、样本、
+  变量、聚类层级、阈值或变换方式。
+license: See LICENSE
+compatibility: >-
+  Requires Python 3.9+ and the dependency listed in requirements.txt for audit scripts;
+  generated Stata code requires user-side Stata and method-specific community packages.
 metadata:
-  version: 1.0.1
+  version: 1.1.0
   language: zh-CN
   domain: empirical-economics
 ---
@@ -22,13 +24,14 @@ metadata:
 固定效应、聚类推断、控制变量、传导期、样本窗口、极端值、指标构造或统计功效，
 并在透明、可复现的前提下生成合理调整方案、Stata代码和审计报告。
 
-本Skill可以主动寻找显著性改善，但每项调整必须有独立于最终p值的诊断或理论依据。
+本Skill可以主动寻找估计准确性、统计功效与推断可靠性的改善；每项调整必须有独立于最终
+p值的诊断或理论依据，不能把“显著”作为规格选择目标。
 
 ## 触发后先读取
 
 1. 读取 `references/decision-rules.md`，确定调整等级和边界。
 2. 根据问题维度读取 `references/method-catalog.md`；需要机器筛选时读取 `references/method-registry.json`。
-3. 需要生成最终材料时读取 `references/reporting-and-audit.md` 和 `assets/final-report-template.md`。
+3. 需要生成最终材料时读取 `references/reporting-and-audit.md`、`references/audit-model.md` 和 `assets/final-report-template.md`。
 4. 用户追问方法是否来自原文时读取 `references/source-map.md`。
 
 ## 必要输入
@@ -52,7 +55,7 @@ metadata:
 
 - 原样复现用户当前模型。
 - 保存基准代码、估计样本、beta、SE、p、95% CI、N、聚类数和warning。
-- 将基准写入不可覆盖的baseline snapshot。
+- 将基准写入一次性锁定的baseline snapshot；哈希链可检测后续编辑，但不是外部数字签名。
 - 在看到后续结果前，明确哪些调整属于预设，哪些属于探索性。
 
 ### 2. 数据优先诊断
@@ -106,12 +109,18 @@ metadata:
 python scripts/initialize_run.py --project assets/example-project.json --out run-output
 python scripts/lock_baseline_result.py --run-dir run-output --entry baseline-result.json
 python scripts/append_adjustment_log.py --log run-output/adjustment_log.jsonl --entry result.json
+python scripts/append_audit_event.py --run-dir run-output --event rejected-attempt.json
+python scripts/verify_run_integrity.py --run-dir run-output
 python scripts/summarize_run.py --project run-output/project.json --log run-output/adjustment_log.jsonl --out run-output/report.md
 ```
 
 先用 `lock_baseline_result.py` 将已复现的基准结果一次性写入快照，再将同一条基准记录追加到日志；快照已锁定时必须新建运行目录。若发现某个规格是依据其p值事后选择的，不得把它伪装为“已批准调整”；应停止将其作为主分析并在最终报告的研究诚信部分说明。
 
 如果用户只需要代码，仍需在代码注释中保留方法ID、理由和报告要求。
+
+若某个规格已因观察到更小的p值而被尝试，不得把它写入批准结果日志；使用
+`scripts/append_audit_event.py` 写入 `audit_events.jsonl`，以便报告“曾经尝试但未获批准”的事实。
+生成最终报告前运行 `scripts/verify_run_integrity.py`，验证项目、注册表、baseline快照、Schema和两条日志的哈希链。最终报告必须由 `summarize_run.py` 按 `assets/final-report-template.md` 的完整章节生成。
 
 ### 6. 分解显著性变化
 
